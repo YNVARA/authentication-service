@@ -29,7 +29,9 @@
         // Paths
         "baseUrl": ".",
         "paths": {
-            "@/*": ["./src/*"]
+            "@/*": ["./src/*"],
+            "@app": ["./src/app.ts"],
+            "@config": ["./src/config/index.ts"],
         }
     }
 }
