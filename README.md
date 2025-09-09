@@ -50,5 +50,8 @@ POST    /auth/login                 # Login & get tokens (JWT)
 POST    /auth/refresh               # Refresh access token
 POST    /auth/logout                # Revoke / logout user
 
+# =======================================
+# User Profile
+# =======================================
 GET     /me                         # Get profile of logged-in user
 ```
