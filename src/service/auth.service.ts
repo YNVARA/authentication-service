@@ -2,6 +2,7 @@ import argon2 from "argon2";
 
 import AuthRepository from "@repository/auth.repository";
 import ResponseError from "@utils/response-error";
+import { generateTokens } from "@utils/jwt";
 
 export default class AuthService {
 
@@ -26,7 +27,7 @@ export default class AuthService {
         return response;
     }
 
-    static async localLogin(email: string, password: string) {
+    static async localLogin(email: string, password: string, userAgent: string, deviceInfo: string) {
         const invalidCredentials = () => {
             throw new ResponseError({
                 status: 401,
@@ -44,7 +45,18 @@ export default class AuthService {
         const localProvider = await AuthRepository.getOAuthProvider(user?.id!, "local");
         if (!localProvider || localProvider.providerUserId !== email) invalidCredentials();
 
-        return user;
+        const { accessToken, refreshToken} = generateTokens(user?.id!);
+        const refreshTokenHash = await argon2.hash(refreshToken);
+        
+        const checkSession = await AuthRepository.checkSession(user?.id!, deviceInfo);
+        if (checkSession) throw new ResponseError({
+            status: 401,
+            code: "ALREADY_LOGGED_IN",
+            message: "User already logged in",
+        });
+
+        AuthRepository.createSession(user?.id!, refreshTokenHash, userAgent, deviceInfo);
+        return accessToken;
     }
 
 }

@@ -22,6 +22,7 @@ export const sessions = pgTable("user_sessions", {
     id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => createId()),
     userId: varchar("user_id", { length: 36 }).notNull().references(() => users.id, { onDelete: "cascade" }),
     refreshTokenHash: varchar("refresh_token_hash", { length: 255 }).notNull(),
+    userAgent: varchar("user_agent", { length: 255 }).notNull(),
     deviceInfo: varchar("device_info", { length: 255 }).notNull(),
     createdAt: timestamp("created_at").defaultNow(),
 });
