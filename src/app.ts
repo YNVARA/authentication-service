@@ -11,6 +11,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.post('/auth/register', AuthController.localRegister);
+app.post('/auth/login', AuthController.localLogin);
 
 app.use(ErrorMiddleware);
 app.use(NotFoundMiddleware);

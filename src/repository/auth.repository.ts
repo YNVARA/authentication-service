@@ -1,5 +1,5 @@
 import { users, authProviders } from "@database/schema";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import db from "@database/index";
 
 export default class AuthRepository {
@@ -22,6 +22,25 @@ export default class AuthRepository {
             .insert(authProviders)
             .values({ userId, provider, providerUserId })
             .returning({ id: authProviders.userId });
+        return authProvider;
+    }
+
+    static async localLogin(email: string): Promise<{ id: string; email: string; passwordHash: string | null } | null> {
+        const [user] = await db
+            .select({ id: users.id, email: users.email, passwordHash: users.passwordHash })
+            .from(users)
+            .where(eq(users.email, email));
+        return user ?? null;
+    }
+
+    static async getOAuthProvider(userId: string, provider: string) {
+        const [authProvider] = await db
+            .select({ id: authProviders.id, userId: authProviders.userId, provider: authProviders.provider, providerUserId: authProviders.providerUserId })
+            .from(authProviders)
+            .where(and(
+                eq(authProviders.userId, userId), 
+                eq(authProviders.provider, provider)
+            ));
         return authProvider;
     }
 

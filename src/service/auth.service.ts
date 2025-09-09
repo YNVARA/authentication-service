@@ -21,9 +21,30 @@ export default class AuthService {
         return response;
     }
 
-    static async addOAuthProvider(userId: string, provider: string, providerUserId: string){
+    static async addOAuthProvider(userId: string, provider: string, providerUserId: string) {
         const response = await AuthRepository.addOAuthProvider(userId, provider, providerUserId);
         return response;
+    }
+
+    static async localLogin(email: string, password: string) {
+        const invalidCredentials = () => {
+            throw new ResponseError({
+                status: 401,
+                code: "INVALID_CREDENTIALS",
+                message: "Invalid credentials",
+            });
+        };
+
+        const user = await AuthRepository.localLogin(email);
+        if (!user || !user.passwordHash) invalidCredentials();
+
+        const isPasswordMatch = await argon2.verify(user?.passwordHash!, password);
+        if (!isPasswordMatch) invalidCredentials();
+
+        const localProvider = await AuthRepository.getOAuthProvider(user?.id!, "local");
+        if (!localProvider || localProvider.providerUserId !== email) invalidCredentials();
+
+        return user;
     }
 
 }
