@@ -44,16 +44,19 @@ export default class AuthRepository {
         return authProvider;
     }
 
-    static async checkSession(userId: string, deviceInfo: string){
+    static async checkSession(userId: string, userAgent: string, deviceInfo: string) {
         const [session] = await db
             .select({
                 id: sessions.id,
                 userId: sessions.userId,
+                refreshTokenHash: sessions.refreshTokenHash,
+                userAgent: sessions.userAgent,
                 deviceInfo: sessions.deviceInfo
             })
             .from(sessions)
             .where(and(
                 eq(sessions.userId, userId),
+                eq(sessions.userAgent, userAgent),
                 eq(sessions.deviceInfo, deviceInfo)
             ));
         return session
@@ -65,6 +68,18 @@ export default class AuthRepository {
             .values({ userId, refreshTokenHash, userAgent, deviceInfo })
             .returning({ id: sessions.id });
         return session!;
+    }
+
+    static async deleteSession(userId: string, userAgent: string, deviceInfo: string) {
+        const [session] = await db
+            .delete(sessions)
+            .where(and(
+                eq(sessions.userId, userId),
+                eq(sessions.userAgent, userAgent),
+                eq(sessions.deviceInfo, deviceInfo)
+            ))
+            .returning({ id: sessions.id });
+        return session;
     }
 
 }
