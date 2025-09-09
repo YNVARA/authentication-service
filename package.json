@@ -20,6 +20,7 @@
     },
     "dependencies": {
         "@paralleldrive/cuid2": "^2.2.2",
+        "argon2": "^0.44.0",
         "dotenv": "^17.2.2",
         "drizzle-kit": "^0.31.4",
         "drizzle-orm": "^0.44.5",

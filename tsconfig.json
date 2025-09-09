@@ -32,10 +32,12 @@
             "@/*": ["./src/*"],
             "@app": ["./src/app.ts"],
             "@config": ["./src/config/index.ts"],
+            "@database/*": ["./src/database/*"],
             "@schema":["./src/database/schema.ts"],
             "@utils/*": ["./src/utils/*"],
 
             "@middleware/*": ["./src/middleware/*"],
+            "@validation/*": ["./src/validation/*"],
             "@controller/*": ["./src/controller/*"],
             "@service/*": ["./src/service/*"],
             "@repository/*": ["./src/repository/*"],
