@@ -33,25 +33,53 @@ AUTH_JWT_REFRESH_TOKEN_SECRET=xxx
 
 ### Endpoint
 
-```bash
-# =======================================
-# OAuth Authentication (Google, GitHub, etc.)
-# =======================================
+<b>Local Register</b>
 
+```bash
+HTTP Method     : POST
+Endpoint        : {x}/auth/register
+Request Body    :
+{
+    "email"             : "",
+    "password"          : "",
+    "confirmPassword"   : ""
+}   
+```
+
+<b>Local Login</b>
+
+```bash
+HTTP Method     : POST
+Endpoint        : {x}/auth/login
+
+Request Body    :
+{
+    "email"     : "",
+    "password"  : "",
+}   
+```
+
+<b>Refresh Token</b>
+
+```bash
+HTTP Method     : POST
+Endpoint        : {x}/auth/refresh
+```
+
+<b>Logout</b>
+
+```bash
+HTTP Method     : POST
+Endpoint        : {x}/auth/logout
+
+Authorization   : Bearer {token}
+```
+
+<b>Other (Process)</b>
+
+```bash
 GET     /auth/:provider             # Redirect user to OAuth provider (Google, GitHub, etc.)
 GET     /auth/:provider/callback    # Callback from provider, verify token & login/register
 POST    /auth/oauth/refresh         # Refresh access token (if using JWT for OAuth users)
-
-# =======================================
-# Local Authentication (Email + Password)
-# =======================================
-POST    /auth/register              # Register a new user
-POST    /auth/login                 # Login & get tokens (JWT)
-POST    /auth/refresh               # Refresh access token
-POST    /auth/logout                # Revoke / logout user
-
-# =======================================
-# User Profile
-# =======================================
 GET     /me                         # Get profile of logged-in user
 ```
