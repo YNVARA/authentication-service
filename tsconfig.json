@@ -32,11 +32,12 @@
             "@/*": ["./src/*"],
             "@app": ["./src/app.ts"],
             "@config": ["./src/config/index.ts"],
-            "@utils": ["./src/utils/*"],
+            "@utils/*": ["./src/utils/*"],
 
-            "@controller": ["./src/controller/*"],
-            "@service": ["./src/service/*"],
-            "@repository": ["./src/repository/*"],
+            "@middleware/*": ["./src/middleware/*"],
+            "@controller/*": ["./src/controller/*"],
+            "@service/*": ["./src/service/*"],
+            "@repository/*": ["./src/repository/*"],
         }
     }
 }
