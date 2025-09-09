@@ -32,6 +32,7 @@
             "@/*": ["./src/*"],
             "@app": ["./src/app.ts"],
             "@config": ["./src/config/index.ts"],
+            "@schema":["./src/database/schema.ts"],
             "@utils/*": ["./src/utils/*"],
 
             "@middleware/*": ["./src/middleware/*"],
