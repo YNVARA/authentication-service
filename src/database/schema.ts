@@ -10,12 +10,12 @@ export const users = pgTable("users", {
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-export const authProviders = pgTable("auth_providers", {
+export const providers = pgTable("auth_providers", {
     id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => createId()),
     userId: varchar("user_id", { length: 36 }).notNull().references(() => users.id, { onDelete: "cascade" }),
     provider: varchar("provider", { length: 20 }).notNull(),
     providerUserId: varchar("provider_user_id", { length: 255 }).notNull(),
-    createdAt: timestamp("created_at").defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const sessions = pgTable("user_sessions", {
@@ -24,5 +24,5 @@ export const sessions = pgTable("user_sessions", {
     refreshTokenHash: varchar("refresh_token_hash", { length: 255 }).notNull(),
     userAgent: varchar("user_agent", { length: 255 }).notNull(),
     deviceInfo: varchar("device_info", { length: 255 }).notNull(),
-    createdAt: timestamp("created_at").defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });

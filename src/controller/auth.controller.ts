@@ -4,7 +4,7 @@ import { UAParser } from "ua-parser-js";
 import Validation from "@utils/validation";
 import cookieOptions from "@utils/cookie";
 
-import { localRegisterSchema, localLoginSchema } from "@validation/auth.validation";
+import { localRegisterSchema, localLoginSchema, getTokenForgotPasswordSchema, resetPasswordSchema } from "@validation/auth.validation";
 import AuthService from "@service/auth.service";
 import ResponseSuccess from "@utils/response-success";
 
@@ -13,8 +13,7 @@ export default class AuthController {
     static async localRegister(req: Request, res: Response, next: NextFunction) {
         try {
             const { data } = Validation(localRegisterSchema, req.body);
-            const create = await AuthService.localRegister(data.email, data.password);
-            const response = await AuthService.addOAuthProvider(create.id, "local", create.email);
+            const response = await AuthService.localRegister(data.email, data.password);
 
             return new ResponseSuccess({
                 status: 201,
@@ -92,4 +91,35 @@ export default class AuthController {
         }
     }
 
+    static async getTokenForgotPassword(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { data } = Validation(getTokenForgotPasswordSchema, req.body);
+            const response = "";
+
+            return new ResponseSuccess({
+                status: 200,
+                code: "GET_CODE_SUCCESS",
+                message: "please check your email",
+                data: response
+            })
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async resetPassword(req: Request, res: Response, next: NextFunction){
+        try {
+            const { data } = Validation(resetPasswordSchema, req.body);
+            const response = "";
+
+            return new ResponseSuccess({
+                status: 200,
+                code: "RESET_PASSWORD_SUCCESS",
+                message: "Reset password successfully",
+                data: response
+            }).send(res);
+        } catch (error) {
+            next(error);
+        }
+    }
 }

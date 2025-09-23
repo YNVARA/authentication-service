@@ -1,13 +1,16 @@
 import argon2 from "argon2";
 
-import AuthRepository from "@repository/auth.repository";
+import UserRepository from "@repository/user.repository";
+import ProviderRepository from "@repository/provider.repository";
+import SessionRepository from "@repository/session.repository";
+
 import ResponseError from "@utils/response-error";
 import { generateTokens, decodeToken, refreshAccessToken } from "@utils/jwt";
 
 export default class AuthService {
 
     static async isEmailTaken(email: string) {
-        const response = await AuthRepository.isEmailTaken(email);
+        const response = await UserRepository.isEmailTaken(email);
         if (response) throw new ResponseError({
             status: 400,
             code: "EMAIL_TAKEN",
@@ -15,57 +18,59 @@ export default class AuthService {
         });
     }
 
+    static async createProvider(userId: string, provider: string, providerUserId: string) {
+        const response = await ProviderRepository.createProvider(userId, provider, providerUserId);
+        return response;
+    }
+
     static async localRegister(email: string, password: string) {
         await this.isEmailTaken(email);
         const passwordHash = await argon2.hash(password);
-        const response = await AuthRepository.localRegister(email, passwordHash);
-        return response;
-    }
-
-    static async addOAuthProvider(userId: string, provider: string, providerUserId: string) {
-        const response = await AuthRepository.addOAuthProvider(userId, provider, providerUserId);
-        return response;
-    }
-
-    static async checkSession(userId: string, userAgent: string, deviceInfo: string) {
-        const checkSession = await AuthRepository.checkSession(userId, userAgent, deviceInfo);
-        if (checkSession) throw new ResponseError({
-            status: 401,
-            code: "ALREADY_LOGGED_IN",
-            message: "User already logged in",
-        })
+        const localResgister = await UserRepository.register(email, passwordHash);
+        await this.createProvider(localResgister.id, "local", email);
+        return localResgister;
     }
 
     static async localLogin(email: string, password: string, userAgent: string, deviceInfo: string) {
-        const invalidCredentials = () => {
-            throw new ResponseError({
-                status: 401,
-                code: "INVALID_CREDENTIALS",
-                message: "Invalid credentials",
-            });
-        };
+        const user = await UserRepository.login(email);
+        if (!user) throw new ResponseError({
+            status: 401,
+            code: "INVALID_CREDENTIALS",
+            message: "Invalid credentials",
+        });
 
-        const user = await AuthRepository.localLogin(email);
-        if (!user || !user.passwordHash) invalidCredentials();
+        const isPasswordMatch = await argon2.verify(user.passwordHash!, password);
+        if (!isPasswordMatch) throw new ResponseError({
+            status: 401,
+            code: "INVALID_CREDENTIALS",
+            message: "Invalid credentials",
+        });
 
-        const isPasswordMatch = await argon2.verify(user?.passwordHash!, password);
-        if (!isPasswordMatch) invalidCredentials();
+        const provider = await ProviderRepository.getProvider(user.id, "local");
+        if (!provider || provider.providerUserId !== email) throw new ResponseError({
+            status: 401,
+            code: "INVALID_CREDENTIALS",
+            message: "Invalid credentials",
+        });
 
-        const localProvider = await AuthRepository.getOAuthProvider(user?.id!, "local");
-        if (!localProvider || localProvider.providerUserId !== email) invalidCredentials();
-
+        const session = await SessionRepository.checkSession(user.id, userAgent, deviceInfo);
+        if (session) throw new ResponseError({
+            status: 401,
+            code: "USER_ALREADY_LOGGED_IN",
+            message: "User already logged in",
+        });
+        
         const response = generateTokens(user?.id!);
         const refreshTokenHash = await argon2.hash(response.refreshToken);
-
-        await this.checkSession(user?.id!, userAgent, deviceInfo);
-        await AuthRepository.createSession(user?.id!, refreshTokenHash, userAgent, deviceInfo);
+        
+        await SessionRepository.createSession(user?.id!, refreshTokenHash, userAgent, deviceInfo);
         return response;
     }
 
     static async localRefreshToken(refreshToken: string, userAgent: string, deviceInfo: string) {
         const decode = decodeToken(refreshToken, "refresh");
 
-        const checkSession = await AuthRepository.checkSession(decode.id, userAgent, deviceInfo);
+        const checkSession = await SessionRepository.checkSession(decode.id, userAgent, deviceInfo);
         if (!checkSession) throw new ResponseError({
             status: 401,
             code: "NOT_LOGGED_IN",
@@ -82,7 +87,7 @@ export default class AuthService {
         const isExpired = decode.exp! < Math.floor(Date.now() / 1000);
 
         if (isExpired) {
-            await AuthRepository.deleteSession(decode.id, userAgent, deviceInfo);
+            await SessionRepository.deleteSession(decode.id, userAgent, deviceInfo);
         }
 
         if (isExpired) throw new ResponseError({
@@ -96,14 +101,14 @@ export default class AuthService {
     }
 
     static async logout(userId: string, userAgent: string, deviceInfo: string) {
-        const checkSession = await AuthRepository.checkSession(userId, userAgent, deviceInfo);
+        const checkSession = await SessionRepository.checkSession(userId, userAgent, deviceInfo);
         if (!checkSession) throw new ResponseError({
             status: 401,
             code: "NOT_LOGGED_IN",
             message: "User not logged in",
         });
 
-        await AuthRepository.deleteSession(userId, userAgent, deviceInfo);
+        await SessionRepository.deleteSession(userId, userAgent, deviceInfo);
     }
 
 }

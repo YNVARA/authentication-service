@@ -18,5 +18,8 @@ app.post('/auth/login', AuthController.localLogin);
 app.post('/auth/refresh', AuthController.localRefreshToken);
 app.post('/auth/logout', AuthMiddleware, AuthController.logout);
 
+app.post('/auth/forgot-password', AuthController.getTokenForgotPassword);
+app.patch('/auth/reset-password/:code', AuthController.resetPassword);
+
 app.use(ErrorMiddleware);
 app.use(NotFoundMiddleware);
