@@ -72,10 +72,10 @@ export default class AuthController {
 
     static async logout(req: Request, res: Response, next: NextFunction) {
         try {
-            const user = (req as any).user;
+            const token = req.cookies.refresh_token;
             const userAgent = req.headers['user-agent'] || "unknown";
             const deviceInfo = new UAParser(req.headers['user-agent'] || "unknown").getDevice().type || "desktop";
-            const response = await AuthService.logout(user.id, userAgent, deviceInfo);
+            const response = await AuthService.logout(token, userAgent, deviceInfo);
 
             res.clearCookie('refresh_token', cookieOptions);
             res.clearCookie('authenticated', cookieOptions);
@@ -84,38 +84,6 @@ export default class AuthController {
                 status: 200,
                 code: "LOGOUT_SUCCESS",
                 message: "Logout successfully",
-                data: response
-            }).send(res);
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    static async getTokenForgotPassword(req: Request, res: Response, next: NextFunction) {
-        try {
-            const { data } = Validation(getTokenForgotPasswordSchema, req.body);
-            const response = "";
-
-            return new ResponseSuccess({
-                status: 200,
-                code: "GET_CODE_SUCCESS",
-                message: "please check your email",
-                data: response
-            })
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    static async resetPassword(req: Request, res: Response, next: NextFunction){
-        try {
-            const { data } = Validation(resetPasswordSchema, req.body);
-            const response = "";
-
-            return new ResponseSuccess({
-                status: 200,
-                code: "RESET_PASSWORD_SUCCESS",
-                message: "Reset password successfully",
                 data: response
             }).send(res);
         } catch (error) {

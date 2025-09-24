@@ -4,6 +4,30 @@ import db from "@database/index";
 
 export default class SessionRepository {
 
+    static async getAllSessionByUserId(userId: string) {
+        const response = await db
+            .select({
+                id: sessions.id,
+                userId: sessions.userId,
+                userAgent: sessions.userAgent,
+                deviceInfo: sessions.deviceInfo
+            })
+            .from(sessions)
+            .where(eq(sessions.userId, userId));
+        return response;
+    }
+
+    static async getSessionById(id: string) {
+        const [session] = await db
+            .select({
+                id: sessions.id,
+                userId: sessions.userId,
+            })
+            .from(sessions)
+            .where(eq(sessions.id, id));
+        return session
+    }
+
     static async checkSession(userId: string, userAgent: string, deviceInfo: string) {
         const [session] = await db
             .select({
@@ -38,6 +62,14 @@ export default class SessionRepository {
                 eq(sessions.userAgent, userAgent),
                 eq(sessions.deviceInfo, deviceInfo)
             ))
+            .returning({ id: sessions.id });
+        return session;
+    }
+
+    static async deleteSessionById(id: string) {
+        const [session] = await db
+            .delete(sessions)
+            .where(eq(sessions.id, id))
             .returning({ id: sessions.id });
         return session;
     }

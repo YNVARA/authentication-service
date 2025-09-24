@@ -3,6 +3,14 @@
 Authentication service built to handle user registration, login, and token management (Access & Refresh Tokens). 
 This project is designed to be used as a **microservice** within a distributed system.
 
+### Requrements
+
+```bash
+npm install -g bun
+npm install -g javascript-obfuscator
+npm install terser -g
+```
+
 ### Getting Started
 
 ```bash
@@ -35,57 +43,4 @@ AUTH_SERVICE_DOMAIN=
 # JWT
 AUTH_JWT_ACCESS_TOKEN_SECRET=xxx
 AUTH_JWT_REFRESH_TOKEN_SECRET=xxx
-```
-
-### Endpoint
-
-<b>Local Register</b>
-
-```bash
-HTTP Method     : POST
-Endpoint        : {x}/auth/register
-Request Body    :
-{
-    "email"             : "",
-    "password"          : "",
-    "confirmPassword"   : ""
-}   
-```
-
-<b>Local Login</b>
-
-```bash
-HTTP Method     : POST
-Endpoint        : {x}/auth/login
-
-Request Body    :
-{
-    "email"     : "",
-    "password"  : "",
-}   
-```
-
-<b>Refresh Token</b>
-
-```bash
-HTTP Method     : POST
-Endpoint        : {x}/auth/refresh
-```
-
-<b>Logout</b>
-
-```bash
-HTTP Method     : POST
-Endpoint        : {x}/auth/logout
-
-Authorization   : Bearer {token}
-```
-
-<b>Other (Process)</b>
-
-```bash
-GET     /auth/:provider             # Redirect user to OAuth provider (Google, GitHub, etc.)
-GET     /auth/:provider/callback    # Callback from provider, verify token & login/register
-POST    /auth/oauth/refresh         # Refresh access token (if using JWT for OAuth users)
-GET     /me                         # Get profile of logged-in user
 ```

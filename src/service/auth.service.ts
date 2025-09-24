@@ -100,15 +100,16 @@ export default class AuthService {
         return response;
     }
 
-    static async logout(userId: string, userAgent: string, deviceInfo: string) {
-        const checkSession = await SessionRepository.checkSession(userId, userAgent, deviceInfo);
+    static async logout(token: string, userAgent: string, deviceInfo: string) {
+        const decoded = decodeToken(token);
+        const checkSession = await SessionRepository.checkSession(decoded.id, userAgent, deviceInfo);
         if (!checkSession) throw new ResponseError({
             status: 401,
             code: "NOT_LOGGED_IN",
             message: "User not logged in",
         });
 
-        await SessionRepository.deleteSession(userId, userAgent, deviceInfo);
+        await SessionRepository.deleteSession(decoded.id, userAgent, deviceInfo);
     }
 
 }

@@ -5,7 +5,8 @@ import AuthMiddleware from "@middleware/auth.middleware";
 import ErrorMiddleware from "@middleware/error.middleware";
 import NotFoundMiddleware from "@middleware/not-found.middleware";
 
-import AuthController from "./controller/auth.controller";
+import AuthController from "@controller/auth.controller";
+import SessionController from "@controller/session.controller";
 
 export const app = express();
 
@@ -16,10 +17,10 @@ app.use(express.urlencoded({ extended: true }));
 app.post('/auth/register', AuthController.localRegister);
 app.post('/auth/login', AuthController.localLogin);
 app.post('/auth/refresh', AuthController.localRefreshToken);
-app.post('/auth/logout', AuthMiddleware, AuthController.logout);
+app.post('/auth/logout', AuthController.logout);
 
-app.post('/auth/forgot-password', AuthController.getTokenForgotPassword);
-app.patch('/auth/reset-password/:code', AuthController.resetPassword);
+app.get('/session', AuthMiddleware, SessionController.getAllSession);
+app.delete('/session/:id', AuthMiddleware, SessionController.deleteSession);
 
 app.use(ErrorMiddleware);
 app.use(NotFoundMiddleware);
