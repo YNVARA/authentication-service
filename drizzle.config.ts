@@ -1,6 +1,6 @@
 import { defineConfig } from 'drizzle-kit';
-import { AUTH_SERVICE_DB } from '@/config';
-import ResponseError from "@/utils/response-error";
+import { AUTH_SERVICE_DB } from './src/config';
+import ResponseError from "./src/utils/response-error";
 
 if (!AUTH_SERVICE_DB) {
     throw new ResponseError({

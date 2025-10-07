@@ -4,6 +4,7 @@ import type { Algorithm } from "jsonwebtoken";
 export const AUTH_SERVICE_HOST = process.env.AUTH_SERVICE_HOST || "localhost";
 export const AUTH_SERVICE_PORT = process.env.AUTH_SERVICE_PORT || 3000;
 export const AUTH_SERVICE_DB = process.env.AUTH_SERVICE_DB;
+export const AUTH_ALLOWED_ORIGINS = process.env.AUTH_CORS_ORIGIN?.split(',') || [];
 
 export const AUTH_SERVICE_ENV = process.env.APP_ENV || "development";
 export const AUTH_SERVICE_DOMAIN = process.env.APP_DOMAIN || "localhost";
