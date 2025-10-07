@@ -1,9 +1,9 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
-import { AUTH_SERVICE_DB } from "@/config";
-import ResponseError from "@/utils/response-error";
-import * as schema from "@schema";
+import { AUTH_SERVICE_DB } from "../config/index";
+import ResponseError from "../utils/response-error";
+import * as schema from "./schema";
 
 if (!AUTH_SERVICE_DB) {
     throw new ResponseError({
