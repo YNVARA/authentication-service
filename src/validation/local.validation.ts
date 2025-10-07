@@ -13,15 +13,3 @@ export const localLoginSchema = z.object({
     email: z.email({ message: "Invalid email" }),
     password: z.string().min(8, "Password must be at least 8 characters"),
 })
-
-export const getTokenForgotPasswordSchema = z.object({
-    email: z.email({ message: "Invalid email" }),
-});
-
-export const resetPasswordSchema = z.object({
-    password: z.string().min(8, "Password must be at least 8 characters"),
-    confirmPassword: z.string().min(8, "Password must be at least 8 characters"),
-}).refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-});
