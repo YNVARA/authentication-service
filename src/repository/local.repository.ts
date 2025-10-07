@@ -16,7 +16,8 @@ export default class LocalAuthRepository {
         const [user] = await db
             .select({ id: users.id, email: users.email, passwordHash: users.passwordHash })
             .from(users)
-            .where(eq(users.email, email));
+            .where(eq(users.email, email))
+            .limit(1);
         return user;
     }
     
