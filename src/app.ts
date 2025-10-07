@@ -7,6 +7,7 @@ import AuthMiddleware from "@middleware/auth.middleware";
 import ErrorMiddleware from "@middleware/error.middleware";
 import NotFoundMiddleware from "@middleware/not-found.middleware";
 
+import AccountController from '@controller/account.controller';
 import TokenController from '@controller/token.controller';
 import LocalAuthController from '@controller/local.controller';
 import SessionController from "@controller/session.controller";
@@ -24,6 +25,9 @@ app.post('/auth/local/logout', LocalAuthController.Logout);
 
 // endpoint for token
 app.post('/auth/refresh', limiter(4, 3), TokenController.GetToken);
+
+// endpoint for account management
+app.patch('/account/password', AuthMiddleware, AccountController.ChangePassword);
  
 // endpoint for session
 app.get('/session', AuthMiddleware, SessionController.getAllSession);

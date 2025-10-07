@@ -12,4 +12,23 @@ export default class UserRepository {
             .limit(1);;
         return !!user;
     }
+
+    static async findUserById(userId: string) {
+        const [user] = await db
+            .select({ id: users.id, email: users.email, passwordHash: users.passwordHash })
+            .from(users)
+            .where(eq(users.id, userId))
+            .limit(1);
+        return user;
+    }
+
+    static async changePasswordById(userId: string, passwordHash: string) {
+        const [user] = await db
+            .update(users)
+            .set({ passwordHash })
+            .where(eq(users.id, userId))
+            .returning({ id: users.id });
+        return user;
+    }
+
 }
