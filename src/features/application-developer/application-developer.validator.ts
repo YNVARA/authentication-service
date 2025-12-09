@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const ApplicationFormSchema = z.object({
+export const ApplicationDeveloperFormSchema = z.object({
     id: z
         .string()
         .optional(),
@@ -15,5 +15,9 @@ export const ApplicationFormSchema = z.object({
     allowed_origins: z
         .string()
         .array()
+        .optional(),
+    active: z
+        .boolean()
+        .default(true)
         .optional(),
 });
