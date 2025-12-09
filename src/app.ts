@@ -10,7 +10,7 @@ import AuthMiddleware from "./middlewares/auth.middleware";
 import limiter from './utils/rate-limit';
 
 // import controllers
-import { DeveloperController } from './features';
+import { DeveloperController, ApplicationController } from './features';
 
 // initialize
 const app = express();
@@ -27,6 +27,10 @@ app.get('/dev/token', limiter(5, 5), DeveloperController.getToken);
 app.get('/dev/profile', AuthMiddleware, DeveloperController.profile);
 app.patch('/dev/profile', AuthMiddleware, DeveloperController.updateProfile);
 app.delete('/dev/logout', DeveloperController.logout);
+
+app.post('/applications', AuthMiddleware, ApplicationController.createApplication);
+app.get('/applications', AuthMiddleware, ApplicationController.getAllApplicationByDeveloperId);
+app.get('/applications/:application_id', AuthMiddleware, ApplicationController.getApplicationById);
 
 // middlewares
 app.use(ErrorMiddleware);
