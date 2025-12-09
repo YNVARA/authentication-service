@@ -1,18 +1,25 @@
+// dependencies
 import 'dotenv/config';
 import type { Algorithm } from "jsonwebtoken";
 
-export const AUTH_SERVICE_HOST = process.env.AUTH_SERVICE_HOST || "localhost";
-export const AUTH_SERVICE_PORT = process.env.AUTH_SERVICE_PORT || 3000;
-export const AUTH_SERVICE_DB = process.env.AUTH_SERVICE_DB;
-export const AUTH_ALLOWED_ORIGINS = process.env.AUTH_CORS_ORIGIN?.split(',') || [];
+// environment variables
+export const APP_HOSTNAME = process.env.APP_HOSTNAME || 'localhost';
+export const APP_PORT = process.env.APP_PORT || '3000';
+export const APP_ENVIRONMENT = process.env.APP_ENVIRONMENT || 'development';
 
-export const AUTH_SERVICE_ENV = process.env.APP_ENV || "development";
-export const AUTH_SERVICE_DOMAIN = process.env.APP_DOMAIN || "localhost";
+// postgres configuration
+export const PG_HOST = process.env.POSTGRESQL_HOST || 'localhost';
+export const PG_PORT = Number(process.env.POSTGRESQL_PORT) || 5432;
+export const PG_USER = process.env.POSTGRESQL_USER || 'postgres';
+export const PG_PASS = process.env.POSTGRESQL_PASSWORD || 'postgres';
+export const PG_DB = process.env.POSTGRESQL_DATABASE || 'postgres';
+export const PG_MAX_CONNECTIONS = 10;
+export const PG_IDLE_TIMEOUT = 30000;
+export const PG_CONNECTION_TIMEOUT = 2000;
 
-export const JWT_CONFIG = {
-    JWT_ACCESS_TOKEN_SECRET: process.env.AUTH_JWT_ACCESS_TOKEN_SECRET || "supersecret-access",
-    JWT_REFRESH_TOKEN_SECRET: process.env.AUTH_JWT_REFRESH_TOKEN_SECRET || "supersecret-refresh",
-    ACCESS_TOKEN_EXPIRY: "5m" as const,
-    REFRESH_TOKEN_EXPIRY: "1d" as const,
-    ALGORITHM: "HS256" as Algorithm,
-};
+// jwt configuration
+export const JWT_ACCESS_TOKEN_SECRET = process.env.JWT_ACCESS_TOKEN_SECRET || "supersecret-access";
+export const JWT_REFRESH_TOKEN_SECRET = process.env.JWT_REFRESH_TOKEN_SECRET || "supersecret-refresh";
+export const JWT_ACCESS_TOKEN_EXPIRY = "5m" as const;
+export const JWT_REFRESH_TOKEN_EXPIRY = "1d" as const;
+export const JWT_ALGORITHM: Algorithm = "HS256";

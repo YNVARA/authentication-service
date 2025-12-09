@@ -1,8 +1,12 @@
+// dependencies
 import type { Response, Request, NextFunction } from "express";
 import jwt, { type JwtPayload, TokenExpiredError } from "jsonwebtoken";
-import { JWT_CONFIG } from "@config";
 
-import ResponseError from "@utils/response-error";
+// environment variables
+import { JWT_ACCESS_TOKEN_SECRET } from "../config";
+
+// response handlers
+import ResponseError from "../utils/response-error";
 
 export default async function AuthMiddleware(req: Request, res: Response, next: NextFunction) {
     try {
@@ -17,7 +21,7 @@ export default async function AuthMiddleware(req: Request, res: Response, next: 
             });
         }
 
-        jwt.verify(token, JWT_CONFIG.JWT_ACCESS_TOKEN_SECRET as string, (err, decoded) => {
+        jwt.verify(token, JWT_ACCESS_TOKEN_SECRET as string, (err, decoded) => {
             if (err) {
                 if (err instanceof TokenExpiredError) {
                     throw new ResponseError({

@@ -1,5 +1,7 @@
+// dependencies
 import rateLimit from "express-rate-limit";
 
+// rate limiter (in minutes, max requests)
 const limiter = (windowMs: number, max: number = 3) => {
     return rateLimit({
         windowMs: windowMs * 60 * 1000,
@@ -13,7 +15,7 @@ const limiter = (windowMs: number, max: number = 3) => {
                 message: "Too many requests, please try again later.",
                 code: "ERR_RATE_LIMIT",
                 details: {
-                    retryAfter: r.rateLimit?.resetTime
+                    retry_after: r.rateLimit?.resetTime
                         ? `${Math.ceil((r.rateLimit.resetTime.getTime() - Date.now()) / 1000)} seconds`
                         : undefined
                 }
@@ -22,4 +24,5 @@ const limiter = (windowMs: number, max: number = 3) => {
     });
 };
 
+// export default
 export default limiter;

@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { ZodError } from "zod";
 
-import ResponseError from "@utils/response-error";
+import ResponseError from "../utils/response-error";
 
 export default function ErrorMiddleware(error: unknown, req: Request, res: Response, next: NextFunction) {
     // Zod Validation Error

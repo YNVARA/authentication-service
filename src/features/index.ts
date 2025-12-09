@@ -1,0 +1,1 @@
+export { default as DeveloperController } from './developer/developer.controller';

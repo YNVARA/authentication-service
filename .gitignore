@@ -2,7 +2,6 @@
 node_modules
 
 # output
-drizzle
 out
 dist
 *.tgz

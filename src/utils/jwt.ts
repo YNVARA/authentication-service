@@ -1,36 +1,42 @@
+// dependencies
 import jwt, { type JwtPayload, type SignOptions, type Algorithm } from "jsonwebtoken";
-import ResponseError from "@utils/response-error";
-import { JWT_CONFIG } from "@config";
 
-export interface AccessTokenPayload {
-    id: string;
-}
+// utils
+import ResponseError from "./response-error";
 
-export interface RefreshTokenPayload {
-    id: string;
-}
+// environment
+import {
+    JWT_ACCESS_TOKEN_SECRET,
+    JWT_REFRESH_TOKEN_SECRET,
+    JWT_ACCESS_TOKEN_EXPIRY,
+    JWT_REFRESH_TOKEN_EXPIRY,
+    JWT_ALGORITHM
+} from "../config";
 
+// interfaces
+export interface AccessTokenPayload { id: string; }
+export interface RefreshTokenPayload { id: string; }
+
+// function for generating tokens
 export function generateTokens(userId: string) {
     const accessPayload: AccessTokenPayload = { id: userId };
     const refreshPayload: RefreshTokenPayload = { id: userId };
 
-    const accessToken = jwt.sign(accessPayload, JWT_CONFIG.JWT_ACCESS_TOKEN_SECRET, {
-        expiresIn: JWT_CONFIG.ACCESS_TOKEN_EXPIRY,
-        algorithm: JWT_CONFIG.ALGORITHM,
+    const access_token = jwt.sign(accessPayload, JWT_ACCESS_TOKEN_SECRET, {
+        expiresIn: JWT_ACCESS_TOKEN_EXPIRY,
+        algorithm: JWT_ALGORITHM,
     } as SignOptions);
 
-    const refreshToken = jwt.sign(refreshPayload, JWT_CONFIG.JWT_REFRESH_TOKEN_SECRET, {
-        expiresIn: JWT_CONFIG.REFRESH_TOKEN_EXPIRY,
-        algorithm: JWT_CONFIG.ALGORITHM,
+    const refresh_token = jwt.sign(refreshPayload, JWT_REFRESH_TOKEN_SECRET, {
+        expiresIn: JWT_REFRESH_TOKEN_EXPIRY,
+        algorithm: JWT_ALGORITHM,
     } as SignOptions);
 
-    return { accessToken, refreshToken };
+    return { access_token, refresh_token };
 }
 
-export function decodeToken(
-    token: string,
-    type: "access" | "refresh" = "access"
-): JwtPayload & { id: string } {
+// function for decoding and verifying tokens
+export function decodeToken(token: string, type: "access" | "refresh" = "access"): JwtPayload & { id: string } {
     try {
         if (!token) {
             throw new ResponseError({
@@ -40,14 +46,11 @@ export function decodeToken(
             });
         }
 
-        const secret =
-            type === "access"
-                ? JWT_CONFIG.JWT_ACCESS_TOKEN_SECRET
-                : JWT_CONFIG.JWT_REFRESH_TOKEN_SECRET;
+        const secret = type === "access"
+            ? JWT_ACCESS_TOKEN_SECRET
+            : JWT_REFRESH_TOKEN_SECRET;
 
-        const decoded = jwt.verify(token, secret, {
-            algorithms: [JWT_CONFIG.ALGORITHM as Algorithm],
-        }) as JwtPayload & { id: string };
+        const decoded = jwt.verify(token, secret, { algorithms: [JWT_ALGORITHM as Algorithm] }) as JwtPayload & { id: string };
 
         if (!decoded.id) {
             throw new ResponseError({
@@ -63,10 +66,9 @@ export function decodeToken(
             throw new ResponseError({
                 status: 401,
                 code: type === "refresh" ? "REFRESH_TOKEN_EXPIRED" : "ACCESS_TOKEN_EXPIRED",
-                message:
-                    type === "refresh"
-                        ? "Your refresh token has expired. Please login again."
-                        : "Your access token has expired. Please refresh your session.",
+                message: type === "refresh"
+                    ? "Your refresh token has expired. Please login again."
+                    : "Your access token has expired. Please refresh your session.",
             });
         }
 
@@ -78,22 +80,23 @@ export function decodeToken(
     }
 }
 
-export function refreshAccessToken(refreshToken: string) {
+// function for refreshing access token
+export function refreshAccessToken(token: string) {
     try {
-        const decoded = decodeToken(refreshToken, "refresh");
+        const decoded = decodeToken(token, "refresh");
         const payload: AccessTokenPayload = { id: decoded.id };
 
-        const newAccessToken = jwt.sign(payload, JWT_CONFIG.JWT_ACCESS_TOKEN_SECRET, {
-            expiresIn: JWT_CONFIG.ACCESS_TOKEN_EXPIRY,
-            algorithm: JWT_CONFIG.ALGORITHM,
+        const new_access_token = jwt.sign(payload, JWT_ACCESS_TOKEN_SECRET, {
+            expiresIn: JWT_ACCESS_TOKEN_EXPIRY,
+            algorithm: JWT_ALGORITHM,
         } as SignOptions);
 
-        return newAccessToken;
+        return new_access_token;
     } catch (err: any) {
         throw new ResponseError({
             status: 401,
             code: "INVALID_REFRESH_TOKEN",
-            message: "Refresh token is invalid or expired",
+            message: "Token is invalid or expired",
         });
     }
 }

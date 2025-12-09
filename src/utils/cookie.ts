@@ -1,14 +1,15 @@
-import { AUTH_SERVICE_ENV, AUTH_SERVICE_DOMAIN } from "@config";
+// environment
+import { APP_ENVIRONMENT } from "../config";
 
 const cookieOptions: any = {
     httpOnly: true,
-    secure: AUTH_SERVICE_ENV === 'production',
+    secure: APP_ENVIRONMENT === 'production',
     sameSite: 'lax',
     path: '/',
 };
 
-if (AUTH_SERVICE_ENV === 'production' && AUTH_SERVICE_DOMAIN) {
-    cookieOptions.domain = AUTH_SERVICE_DOMAIN;
-}
+// if (APP_ENVIRONMENT === 'production' && AUTH_SERVICE_DOMAIN) {
+//     cookieOptions.domain = AUTH_SERVICE_DOMAIN;
+// }
 
 export default cookieOptions;

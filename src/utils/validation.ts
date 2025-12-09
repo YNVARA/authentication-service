@@ -1,6 +1,8 @@
+// dependencies
 import { ZodType } from "zod";
 import ResponseError from "./response-error";
 
+// types for success response
 type SuccessResponse<T> = {
     status: number;
     message: string;
@@ -11,13 +13,13 @@ const Validation = <T>(schema: ZodType<T>, data: unknown): SuccessResponse<T> =>
     const result = schema.safeParse(data);
 
     if (!result.success) {
-        // Format error issues dari Zod
+        // Format error issues
         const details = result.error.issues.map((issue) => ({
             path: issue.path.join("."),
             message: issue.message
         }));
 
-        // Lempar pakai ResponseError biar konsisten
+        // Throw error
         throw new ResponseError({
             status: 400,
             message: "Validation failed",
@@ -26,7 +28,7 @@ const Validation = <T>(schema: ZodType<T>, data: unknown): SuccessResponse<T> =>
         });
     }
 
-    // Kalau sukses
+    // Validation successful
     return {
         status: 200,
         message: "Validation success",

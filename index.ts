@@ -1,6 +1,11 @@
-import { app } from "@/app";
-import { AUTH_SERVICE_PORT } from "@/config";
+// depedency
+import app from "./src/app";
 
-app.listen(AUTH_SERVICE_PORT, () => {
-    console.log(`Server is running on port ${AUTH_SERVICE_PORT}`);
-});
+// environment variables
+import { APP_HOSTNAME, APP_PORT, APP_ENVIRONMENT } from "./src/config";
+
+// start server
+app.listen(APP_PORT, () => {
+    console.log(`Server started at http://${APP_HOSTNAME}:${APP_PORT} in ${APP_ENVIRONMENT} mode`);
+})
+

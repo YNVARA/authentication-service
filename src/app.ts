@@ -1,59 +1,35 @@
-// libray
-import cookieParser from 'cookie-parser';
+// library
 import express from 'express';
-import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
-// limiter
-import limiter from "@utils/rate-limit";
+// import middlewares
+import ErrorMiddleware from './middlewares/error.middleware';
+import AuthMiddleware from "./middlewares/auth.middleware";
+
+// import utils
+import limiter from './utils/rate-limit';
+
+// import controllers
+import { DeveloperController } from './features';
+
+// initialize
+const app = express();
 
 // middleware
-import AuthMiddleware from "@middleware/auth.middleware";
-import ErrorMiddleware from "@middleware/error.middleware";
-import NotFoundMiddleware from "@middleware/not-found.middleware";
-
-// controllers
-import AccountController from '@controller/account.controller';
-import TokenController from '@controller/token.controller';
-import LocalAuthController from '@controller/local.controller';
-import SessionController from "@controller/session.controller";
-
-// config
-import {AUTH_ALLOWED_ORIGINS} from "@config";
-
-// init
-export const app = express();
-
-// setup cors
-app.use(cors({
-    origin: (origin, callback) => {
-        if (!origin) return callback(null, true);
-        if (AUTH_ALLOWED_ORIGINS.includes(origin)) { return callback(null, true); }
-        else { return callback(new Error('Not allowed by CORS')); }
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS']
-}));
-
-// setup main middleware
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// endpoint for local auth management (login, register, logout)
-app.post('/auth/local/register', LocalAuthController.Register);
-app.post('/auth/local/login', LocalAuthController.Login);
-app.post('/auth/local/logout', LocalAuthController.Logout);
+// routes
+app.post('/dev/register', limiter(1, 5), DeveloperController.register);
+app.post('/dev/login', limiter(1, 5), DeveloperController.login);
+app.get('/dev/token', limiter(5, 5), DeveloperController.getToken);
+app.get('/dev/profile', AuthMiddleware, DeveloperController.profile);
+app.patch('/dev/profile', AuthMiddleware, DeveloperController.updateProfile);
+app.delete('/dev/logout', DeveloperController.logout);
 
-// endpoint for token
-app.post('/auth/refresh', limiter(4, 3), TokenController.GetToken);
-
-// endpoint for account management
-app.patch('/account/password', AuthMiddleware, AccountController.ChangePassword);
-
-// endpoint for session
-app.get('/session', AuthMiddleware, SessionController.getAllSession);
-app.delete('/session/:id', AuthMiddleware, SessionController.deleteSession);
-
-// setup error middleware
+// middlewares
 app.use(ErrorMiddleware);
-app.use(NotFoundMiddleware);
+
+// export default
+export default app;

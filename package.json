@@ -1,50 +1,35 @@
 {
     "name": "auth-service",
+    "author": {
+        "name": "yudha ginong pratidina",
+        "email": "dev.yudhaginongpratidina@gmail.com"
+    },
     "module": "index.ts",
     "type": "module",
     "private": true,
     "scripts": {
         "dev": "bun --watch index.ts",
-        "test": "jest --runInBand",
-        "start": "bun run ./dist/index.min.js",
         "build": "bun build index.ts --target=node --outdir ./dist && javascript-obfuscator dist --output dist && npx terser dist/index.js -c -m -o dist/index.min.js",
-        "db:generate": "drizzle-kit generate",
-        "db:migrate": "drizzle-kit migrate"
+        "start": "bun run ./dist/index.min.js"
     },
     "devDependencies": {
-        "@babel/plugin-transform-runtime": "^7.28.3",
-        "@babel/preset-env": "^7.28.3",
-        "@babel/runtime": "^7.28.4",
         "@types/bun": "latest",
-        "@types/cookie-parser": "^1.4.9",
-        "@types/cors": "^2.8.19",
-        "@types/express": "^5.0.3",
-        "@types/jest": "^30.0.0",
+        "@types/cookie-parser": "^1.4.10",
+        "@types/express": "^5.0.6",
         "@types/jsonwebtoken": "^9.0.10",
-        "@types/pg": "^8.15.5",
-        "@types/supertest": "^6.0.3",
-        "babel-jest": "^30.2.0",
-        "jest": "^30.2.0",
-        "supertest": "^7.1.4",
-        "ts-jest": "^29.4.4"
+        "@types/pg": "^8.15.6"
     },
     "peerDependencies": {
         "typescript": "^5"
     },
     "dependencies": {
-        "@paralleldrive/cuid2": "^2.2.2",
         "argon2": "^0.44.0",
         "cookie-parser": "^1.4.7",
-        "cors": "^2.8.5",
-        "dotenv": "^17.2.2",
-        "drizzle-kit": "^0.31.4",
-        "drizzle-orm": "^0.44.5",
-        "express": "^5.1.0",
-        "express-rate-limit": "^8.1.0",
-        "jsonwebtoken": "^9.0.2",
+        "dotenv": "^17.2.3",
+        "express": "^5.2.1",
+        "express-rate-limit": "^8.2.1",
+        "jsonwebtoken": "^9.0.3",
         "pg": "^8.16.3",
-        "ts-node": "^10.9.2",
-        "ua-parser-js": "^2.0.4",
-        "zod": "^4.1.5"
+        "zod": "^4.1.13"
     }
 }
