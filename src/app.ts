@@ -50,19 +50,8 @@ app.post('/dev/applications', AuthMiddleware, ApplicationDeveloperController.cre
 app.get('/dev/applications', AuthMiddleware, ApplicationDeveloperController.get_all_application_by_developer_id);
 app.get('/dev/applications/:application_id', AuthMiddleware, ApplicationDeveloperController.get_application_by_id_and_developer_id);
 app.patch('/dev/applications/:application_id', AuthMiddleware, ApplicationDeveloperController.update_application_by_id_and_developer_id);
+app.patch('/dev/applications/:application_id/client-secret', limiter(1440, 10), AuthMiddleware, ApplicationDeveloperController.update_client_secret_by_application_id_and_developer_id);
 app.delete('/dev/applications/:application_id', AuthMiddleware, ApplicationDeveloperController.delete_application_by_id_and_developer_id);
-
-// -------------------------------------------------------------------------------
-// application authentication routes (developer) - on going
-// -------------------------------------------------------------------------------
-// - app register account end user
-// - app login account end user
-// - app logout account end user
-// - app get token account end user
-// - app get profile account
-// - app update profile account
-// - app delete account
-// -------------------------------------------------------------------------------
 
 // middlewares
 app.use(ErrorMiddleware);

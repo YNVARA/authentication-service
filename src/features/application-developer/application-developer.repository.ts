@@ -50,6 +50,23 @@ export default class ApplicationDeveloperRepository {
         };
     }
 
+    static async update_client_secret_by_application_id_and_developer_id(application_id: string | number, developer_id: string | number) {
+        const query = `
+            UPDATE applications set
+                client_secret = $1
+            WHERE id = $2 AND developer_id = $3
+            RETURNING id, developer_id, name, description, client_secret
+        `;
+
+        const values = [generateClientSecret(), application_id, developer_id];
+        const result = await pg.query(query, values);
+        return {
+            id: result.rows[0]?.id,
+            developer_id: result.rows[0]?.developer_id,
+            client_secret: result.rows[0]?.client_secret
+        }
+    }
+
     static async update_application_by_id_and_developer_id(application_id: string | number, developer_id: string | number, data: ApplicationDeveloperFormRequest) {
         const query = `
             UPDATE applications set

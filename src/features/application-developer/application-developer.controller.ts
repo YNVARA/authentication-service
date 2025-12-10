@@ -29,6 +29,22 @@ export default class ApplicationDeveloperController {
         }
     }
 
+    static async update_client_secret_by_application_id_and_developer_id(req: Request, res: Response, next: NextFunction) {
+        try {
+            const developer = (req as any).user;
+            const { application_id } = req.params;
+            const response = await AppliactionDeveloperService.update_client_secret_by_application_id_and_developer_id(application_id as string | number, developer.id);
+            return new ResponseSuccess({
+                status: 200,
+                code: "CLIENT_SECRET_UPDATED",
+                message: "Client secret updated successfully",
+                data: response,
+            }).send(res);
+        } catch (error) {
+            next(error);
+        }
+    }
+
     static async update_application_by_id_and_developer_id(req: Request, res: Response, next: NextFunction) {
         try {
             const developer = (req as any).user;

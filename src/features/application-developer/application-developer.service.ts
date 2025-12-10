@@ -30,6 +30,20 @@ export default class AppliactionDeveloperService {
         return response;
     }
 
+    static async update_client_secret_by_application_id_and_developer_id(application_id: string | number, developer_id: string | number) {
+        const existing_application = await ApplicationDeveloperRepository.find_application_by_id_and_developer_id(application_id, developer_id);
+        if (!existing_application) {
+            throw new ResponseError({
+                status: 404,
+                code: "APPLICATION_NOT_FOUND",
+                message: "Application not found",
+            });
+        }
+        
+        const response = await ApplicationDeveloperRepository.update_client_secret_by_application_id_and_developer_id(application_id, developer_id);
+        return response;
+    }
+
     static async update_application_by_id_and_developer_id(developer_id: string | number, application_id: string | number, data: ApplicationDeveloperFormRequest) {
         const existing_application = await ApplicationDeveloperRepository.find_application_by_id_and_developer_id(application_id, developer_id);
         if (!existing_application) {
