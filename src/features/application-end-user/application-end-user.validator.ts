@@ -21,3 +21,11 @@ export const ApplicationEndUserRegisterFormSchema = z.object({
     message: "Passwords do not match",
     path: ["confirm_password"],
 })
+
+export const ApplicationEndUserLoginFormSchema = z.object({
+    email: z
+        .email({ message: "Invalid email" }),
+    password: z
+        .string()
+        .min(8, "Password must be at least 8 characters"),
+})

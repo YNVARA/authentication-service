@@ -4,3 +4,8 @@ export type ApplicationEndUserRegisterFormRequest = {
     email: string;
     password: string;
 }
+
+export type ApplicationEndUserLoginRequest = {
+    email: string;
+    password: string;
+}

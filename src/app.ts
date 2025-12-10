@@ -64,6 +64,7 @@ app.delete('/dev/applications/:application_id', AuthMiddleware, ApplicationDevel
 // - register end user
 // -------------------------------------------------------------------------------
 app.post('/register', AppMiddleware, ApplicationEndUserController.register);
+app.post('/login', AppMiddleware, ApplicationEndUserController.login);
 
 
 // middlewares

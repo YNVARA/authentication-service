@@ -41,4 +41,16 @@ export default class ApplicationEndUserRepository {
         return result.rows[0];
     }
 
+    static async find_user_by_application_id_and_email(application_id: string | number, email: string) {
+        const query = `
+            SELECT id, application_id, first_name, last_name, email
+            FROM applications_users
+            WHERE application_id = $1 AND email = $2
+        `;
+        const values = [application_id, email];
+        const result = await pg.query(query, values);
+        if (result.rowCount === 0) return null;
+        return result.rows[0];
+    }
+
 }

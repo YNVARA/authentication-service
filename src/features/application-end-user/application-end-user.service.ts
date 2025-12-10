@@ -8,7 +8,10 @@ import ApplicationEndUserRepository from "./application-end-user.repository";
 import ResponseError from "../../utils/response-error";
 
 // types
-import type { ApplicationEndUserRegisterFormRequest } from './application-end-user.type';
+import type { ApplicationEndUserRegisterFormRequest, ApplicationEndUserLoginRequest } from './application-end-user.type';
+
+// utils
+import { generateClientTokens } from "../../utils/jwt-client";
 
 export default class ApplicationEndUserService {
 
@@ -35,6 +38,29 @@ export default class ApplicationEndUserService {
         data.password = password_hash;
 
         const response = await ApplicationEndUserRepository.create_new_user(application.id, data);
+        return response;
+    }
+
+    static async login(client_id: string, client_secret: string, data: ApplicationEndUserLoginRequest) {
+        const application = await ApplicationEndUserRepository.find_application_by_client_id_and_client_secret(client_id, client_secret);
+        if (!application) {
+            throw new ResponseError({
+                "status": 404,
+                "code": "APPLICATION_NOT_FOUND",
+                "message": "Application not found"
+            })
+        }
+
+        const user = await ApplicationEndUserRepository.find_user_by_application_id_and_email(application.id, data.email);
+        if (!user) {
+            throw new ResponseError({
+                "status": 404,
+                "code": "USER_NOT_FOUND",
+                "message": "User not found"
+            })
+        }
+
+        const response = await generateClientTokens(user.id);
         return response;
     }
 
