@@ -5,12 +5,17 @@ import cookieParser from 'cookie-parser';
 // import middlewares
 import ErrorMiddleware from './middlewares/error.middleware';
 import AuthMiddleware from "./middlewares/auth.middleware";
+import AppMiddleware from './middlewares/app.middleware';
 
 // import utils
 import limiter from './utils/rate-limit';
 
 // import controllers
-import { DeveloperController, ApplicationDeveloperController } from './features';
+import {
+    DeveloperController,
+    ApplicationDeveloperController,
+    ApplicationEndUserController
+} from './features';
 
 // initialize
 const app = express();
@@ -52,6 +57,14 @@ app.get('/dev/applications/:application_id', AuthMiddleware, ApplicationDevelope
 app.patch('/dev/applications/:application_id', AuthMiddleware, ApplicationDeveloperController.update_application_by_id_and_developer_id);
 app.patch('/dev/applications/:application_id/client-secret', limiter(1440, 10), AuthMiddleware, ApplicationDeveloperController.update_client_secret_by_application_id_and_developer_id);
 app.delete('/dev/applications/:application_id', AuthMiddleware, ApplicationDeveloperController.delete_application_by_id_and_developer_id);
+
+// -------------------------------------------------------------------------------
+// application users routes (developer)
+// -------------------------------------------------------------------------------
+// - register end user
+// -------------------------------------------------------------------------------
+app.post('/register', AppMiddleware, ApplicationEndUserController.register);
+
 
 // middlewares
 app.use(ErrorMiddleware);
