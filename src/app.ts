@@ -59,7 +59,7 @@ app.patch('/dev/applications/:application_id/client-secret', limiter(1440, 10), 
 app.delete('/dev/applications/:application_id', AuthMiddleware, ApplicationDeveloperController.delete_application_by_id_and_developer_id);
 
 // -------------------------------------------------------------------------------
-// application users routes (developer)
+// application users routes (end user)
 // -------------------------------------------------------------------------------
 // - register end user
 // - login end user
