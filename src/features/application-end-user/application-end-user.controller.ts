@@ -10,6 +10,7 @@ import ApplicationEndUserService from "./application-end-user.service";
 
 // response handlers
 import ResponseSuccess from "../../utils/response-success";
+import ResponseError from "../../utils/response-error";
 
 // utils
 import cookieOptions from "../../utils/cookie";
@@ -46,6 +47,30 @@ export default class ApplicationEndUserController {
                 code: "USER_LOGGED_IN",
                 message: "User logged in successfully",
                 data: response.access_token
+            }).send(res);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async logout(req: Request, res: Response, next: NextFunction) {
+        try {
+            const token = req.cookies.client_refresh_token;
+            if (!token) {
+                throw new ResponseError({
+                    status: 401,
+                    code: "UNAUTHORIZED",
+                    message: "Unauthorized",
+                });
+            }
+
+            res.clearCookie('client_refresh_token', cookieOptions);
+            res.clearCookie('client_authenticated', cookieOptions);
+
+            return new ResponseSuccess({
+                status: 200,
+                code: "LOGOUT_SUCCESS",
+                message: "Logout successfully",
             }).send(res);
         } catch (error) {
             next(error);
