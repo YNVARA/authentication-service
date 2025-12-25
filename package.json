@@ -13,9 +13,15 @@
         "start": "bun run ./dist/index.min.js"
     },
     "devDependencies": {
-        "@types/bun": "latest"
+        "@types/bun": "latest",
+        "@types/express": "^5.0.6"
     },
     "peerDependencies": {
         "typescript": "^5"
+    },
+    "dependencies": {
+        "dotenv": "^17.2.3",
+        "express": "^5.2.1",
+        "node-vault": "^0.10.9"
     }
 }
