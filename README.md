@@ -1,20 +1,15 @@
-# AUTH SERVICE
+# auth-service
 
-This is a service for authentication.
-
-## Repository
+To install dependencies:
 
 ```bash
-https://github.com/Styxian-Legion/auth-service.git
+bun install
 ```
 
-## Tech Stack
+To run:
 
-- Bun
-- TypeScript
-- Express
-- PostgreSQL
+```bash
+bun run index.ts
+```
 
-## API Documentation
-
-- [Developer Endpoint](docs/developer-doc.md)
+This project was created using `bun init` in bun v1.3.5. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
