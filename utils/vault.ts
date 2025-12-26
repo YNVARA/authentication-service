@@ -1,28 +1,27 @@
-// import dependencies
 import vault from "node-vault";
 
-
-// initialize
-const config = vault({
+const client = vault({
     apiVersion: "v1",
-    endpoint: "http://localhost:8200",
-    token: "root"
-})
+    endpoint: process.env.VAULT_ADDR!,
+    token: process.env.VAULT_TOKEN!
+});
 
+let cache: Record<string, any> | null = null;
 
-// get secret
-const vault_client = async (secret_name: string) => {
-    try {
-        const response = await config.read("secret/data/auth-service");
-        const { data } = response.data;
+const loadSecrets = async () => {
+    if (cache) return cache;
 
-        return data[secret_name];
-    } catch (error: any) {
-        console.error("Vault Error:", error.message);
-        return null;
-    }
+    const { data } = await client.read("secret/data/auth-service");
+    cache = data.data;
+    return cache;
 };
 
+const getSecret = async (key: string) => {
+    const secrets = await loadSecrets();
+    if (!secrets || !(key in secrets)) {
+        throw new Error(`Secret ${key} not found in Vault`);
+    }
+    return secrets[key];
+};
 
-// export
-export default vault_client
+export default getSecret;

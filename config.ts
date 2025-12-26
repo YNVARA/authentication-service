@@ -1,11 +1,25 @@
-// import utils
-import vault_client from "./utils/vault";
+// import dependencies
+import dotenv from "dotenv";
 
-// secret for app service
+
+// initialize
+dotenv.config();
+
+
+// app config
 export const APP_CONFIG = {
-    STATUS: await vault_client("APP_STATUS"),
-    NAME: await vault_client("APP_NAME"),
-    PORT_DEVELOPMENT: await vault_client("APP_PORT_DEVELOPMENT"),
-    PORT_PRODUCTION: await vault_client("APP_PORT_PRODUCTION"),
-    VERSION: await vault_client("APP_VERSION")
+    NAME: process.env.APP_NAME,
+    VERSION: process.env.APP_VERSION,
+    HOST: process.env.APP_HOST,
+    PORT: process.env.APP_PORT
+}
+
+
+// database config
+export const PG_CONFIG = {
+    HOST: process.env.PG_DB_HOST,
+    PORT: process.env.PG_DB_PORT,
+    USER: process.env.PG_DB_USER,
+    PASSWORD: process.env.PG_DB_PASS,
+    DATABASE: process.env.PG_DB_NAME
 }
