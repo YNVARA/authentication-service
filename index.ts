@@ -5,9 +5,13 @@ import express from 'express';
 import { APP_CONFIG } from './config';
 
 
+// import custom middleware
+import ErrorMiddleware from './middlewares/error.middleware';
+
+
 // import routes
-import WellcomeContainer from './src/wellcome/container';
-import AuthController from './src/authentication/controller';
+import WellcomeContainer from './src/wellcome/wellcome.controller';
+import AuthController from './src/authentication/auth.controller';
 
 
 // initialize
@@ -34,6 +38,10 @@ app.post("/auth/change-password", AuthController.changePassword);
 app.post("/auth/deactive-account", AuthController.deactiveAccount);
 app.post("/auth/reactivate-account", AuthController.reactivateAccount);
 app.post("/auth/delete-account", AuthController.deleteAccount);
+
+
+// middlewares
+app.use(ErrorMiddleware);
 
 
 // listener

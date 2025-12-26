@@ -1,0 +1,10 @@
+### AUTH - POST - REGISTER
+POST  http://{{hostname}}:{{port}}/auth/register
+Content-Type: application/json
+
+{
+    "email" : "user@test.com",
+    "username" : "user",
+    "password" : "123456",
+    "confirm_password" : "123456"
+}
