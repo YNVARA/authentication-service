@@ -4196,16 +4196,20 @@
       "index": "b0w",
       "roundness": null,
       "seed": 862759219,
-      "version": 853,
-      "versionNonce": 1820764633,
+      "version": 854,
+      "versionNonce": 1240114127,
       "isDeleted": false,
       "boundElements": [
         {
           "id": "WHxjSByFQrOiM3vX4DQJi",
           "type": "arrow"
+        },
+        {
+          "id": "2yiztOlz1sp-R8o5L6LX4",
+          "type": "arrow"
         }
       ],
-      "updated": 1766682817473,
+      "updated": 1766835377192,
       "link": null,
       "locked": false,
       "text": "delete account\n- method : post\n- endpoint : /auth/account\n- request bearir : token jwt\n- request body :\n    -  confirm\n    - password",
@@ -4346,10 +4350,10 @@
     {
       "id": "2yiztOlz1sp-R8o5L6LX4",
       "type": "arrow",
-      "x": 2111.1173240886687,
-      "y": 4160.752879378157,
-      "width": 422.2815372429259,
-      "height": 22.573675965499206,
+      "x": 2256.1954816488233,
+      "y": 4167.786971865922,
+      "width": 277.20337968277136,
+      "height": 29.607768453264725,
       "angle": 0,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
@@ -4363,11 +4367,11 @@
       "index": "b0z",
       "roundness": null,
       "seed": 76298777,
-      "version": 172,
-      "versionNonce": 1019844183,
+      "version": 247,
+      "versionNonce": 2115822127,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1766682826132,
+      "updated": 1766835377831,
       "link": null,
       "locked": false,
       "points": [
@@ -4376,15 +4380,19 @@
           0
         ],
         [
-          422.2815372429259,
-          -22.573675965499206
+          277.20337968277136,
+          -29.607768453264725
         ]
       ],
       "lastCommittedPoint": null,
-      "startBinding": null,
+      "startBinding": {
+        "elementId": "jOoyXvAJN-neJYLCSu9XO",
+        "focus": 0.2212100837419239,
+        "gap": 10.74824728183421
+      },
       "endBinding": {
         "elementId": "m5Q46iftqrn5LJM4Y81SU",
-        "focus": 0.6315215345235896,
+        "focus": 0.6704093469994385,
         "gap": 9.316727659083426
       },
       "startArrowhead": null,

@@ -1,19 +1,19 @@
 // // dependencies
-// import { Pool } from "pg";
+import { Pool } from "pg";
 
 // // environment variables
-// import { PG_HOST, PG_PORT, PG_USER, PG_PASS, PG_DB, PG_MAX_CONNECTIONS, PG_IDLE_TIMEOUT, PG_CONNECTION_TIMEOUT } from "../config";
+import { PG_CONFIG } from "../config";
 
-// const pg = new Pool({
-//     host: PG_HOST,
-//     port: PG_PORT as number,
-//     user: PG_USER,
-//     password: PG_PASS,
-//     database: PG_DB,
-//     max: PG_MAX_CONNECTIONS,
-//     idleTimeoutMillis: PG_IDLE_TIMEOUT,
-//     connectionTimeoutMillis: PG_CONNECTION_TIMEOUT,
-// });
+const pg = new Pool({
+    host: PG_CONFIG.HOST,
+    port: PG_CONFIG.PORT ? parseInt(PG_CONFIG.PORT, 10) : undefined,
+    user: PG_CONFIG.USER,
+    password: PG_CONFIG.PASSWORD,
+    database: PG_CONFIG.DATABASE,
+    max: PG_CONFIG.MAX_CONNECTION ? parseInt(PG_CONFIG.MAX_CONNECTION, 10) : undefined,
+    idleTimeoutMillis: PG_CONFIG.IDLE_TIMEOUT ? parseInt(PG_CONFIG.IDLE_TIMEOUT, 10) : undefined,
+    connectionTimeoutMillis: PG_CONFIG.CONNECTION_TIMEOUT ? parseInt(PG_CONFIG.CONNECTION_TIMEOUT, 10) : undefined,
+});
 
 // // export default
-// export default pg;
+export default pg;
