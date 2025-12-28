@@ -35,7 +35,7 @@ export default class AuthController {
 
             const ip = (req.ip || '').replace('::ffff:', '');
             const ua = req.get('User-Agent') || '';
-            const payload = {...data, ip, ua}
+            const payload = { ...data, ip, ua }
 
             const response = await AuthService.login(payload);
             return new ResponseSuccess({
@@ -124,6 +124,19 @@ export default class AuthController {
     static async deleteAccount(req: Request, res: Response, next: NextFunction) {
         try {
 
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async myAccount(req: Request, res: Response, next: NextFunction) {
+        try {
+            return res.status(200).json({
+                status: 200,
+                code: "TOKEN_SUCCESS",
+                message: "token successful",
+                data: "token successful"
+            });
         } catch (error) {
             next(error);
         }

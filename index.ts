@@ -6,6 +6,7 @@ import { APP_CONFIG } from './config';
 
 
 // import custom middleware
+import AuthMiddleware from './middlewares/auth.middleware';
 import ErrorMiddleware from './middlewares/error.middleware';
 
 
@@ -38,6 +39,7 @@ app.post("/auth/change-password", AuthController.changePassword);
 app.post("/auth/deactive-account", AuthController.deactiveAccount);
 app.post("/auth/reactivate-account", AuthController.reactivateAccount);
 app.post("/auth/delete-account", AuthController.deleteAccount);
+app.get("/auth/my-account", AuthMiddleware, AuthController.myAccount);
 
 
 // middlewares
