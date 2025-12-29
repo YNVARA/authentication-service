@@ -33,6 +33,7 @@ app.post("/auth/register", AuthController.register);
 app.post("/auth/login", AuthController.login);
 app.get("/auth/token", AuthController.token);
 app.post("/auth/logout", AuthMiddleware, AuthController.logout);
+
 app.post("/auth/verify-email", AuthController.emailVerification);
 app.post("/auth/resend-email-verification", AuthController.resendEmailVerification);
 app.post("/auth/forgot-password", AuthController.forgotPassword);
