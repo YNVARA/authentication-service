@@ -1,5 +1,6 @@
 // import dependencies
 import express from 'express';
+import cookieParser from 'cookie-parser';
 
 // import config
 import { APP_CONFIG } from './config';
@@ -20,6 +21,7 @@ const app = express();
 
 
 // middlewares
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

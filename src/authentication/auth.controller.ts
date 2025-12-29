@@ -8,8 +8,12 @@ import { RegisterSchema, LoginSchema } from "./auth.validator";
 // services
 import AuthService from "./auth.service";
 
-// response
+// utils
+import { redis } from "../../utils/redis";
+import { decode_token } from "../../utils/jwt";
+import { cookieOptions } from "../../utils/cookie";
 import ResponseSuccess from "../../utils/response-success";
+import ResponseError from "../../utils/response-error";
 
 // initialize class for authentication controller
 export default class AuthController {
@@ -38,6 +42,9 @@ export default class AuthController {
             const payload = { ...data, ip, ua }
 
             const response = await AuthService.login(payload);
+            res.cookie('refresh_token', response.refresh_token, cookieOptions);
+            res.cookie('authenticated', true, cookieOptions);
+
             return new ResponseSuccess({
                 status: 200,
                 code: "LOGIN_SUCCESS",
@@ -50,9 +57,42 @@ export default class AuthController {
     }
 
     static async token(req: Request, res: Response, next: NextFunction) {
-        try {
+        let decoded: any = null;
 
+        try {
+            const token = req.cookies.refresh_token;
+            const response = await AuthService.refresh_token(token);
+            return new ResponseSuccess({
+                status: 200,
+                code: "GET_TOKEN_SUCCESS",
+                message: "get token successful",
+                data: {
+                    access_token: response
+                }
+            }).send(res);
         } catch (error) {
+            if (error instanceof ResponseError) {
+                const destroySessionErrors = [
+                    "INVALID_REFRESH_TOKEN",
+                    "SESSION_INVALID",
+                    "ACCOUNT_NOT_ACTIVE",
+                    "REFRESH_TOKEN_EXPIRED"
+                ];
+
+                if (error.code && destroySessionErrors.includes(error.code)) {
+                    try {
+                        decoded = decode_token(req.cookies.refresh_token, "refresh");
+                    } catch { }
+
+                    if (decoded?.sid) {
+                        await redis.del(`session:${decoded.sid}`);
+                    }
+
+                    res.clearCookie("refresh_token", cookieOptions);
+                    res.clearCookie("authenticated", cookieOptions);
+                }
+            }
+
             next(error);
         }
     }

@@ -9,7 +9,9 @@ export const APP_CONFIG = {
     NAME: process.env.APP_NAME,
     VERSION: process.env.APP_VERSION,
     HOST: process.env.APP_HOST,
-    PORT: process.env.APP_PORT
+    PORT: process.env.APP_PORT,
+    ENVIRONMENT: process.env.APP_ENVIRONMENT,
+    DOMAIN: process.env.APP_DOMAIN
 }
 
 // database config

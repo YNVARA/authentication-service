@@ -6,7 +6,7 @@ import AuthRepository from "./auth.repository";
 
 // import utils
 import ResponseError from "../../utils/response-error";
-import { generate_tokens } from "../../utils/jwt";
+import { generate_tokens, decode_token, refreshAccessToken } from "../../utils/jwt";
 import { redis } from "../../utils/redis";
 
 // service for handle authentication
@@ -94,6 +94,11 @@ export default class AuthService {
         }
 
         return response_payload;
+    }
+
+    static async refresh_token(token: string) {
+        const response = await refreshAccessToken(token);
+        return response;
     }
 
 }

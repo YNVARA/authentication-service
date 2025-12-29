@@ -6,6 +6,8 @@ import { randomUUID } from "crypto";
 import { JWT_CONFIG } from "../config";
 
 // import utils
+import { redis } from "./redis";
+import pg from "./pg";
 import ResponseError from "./response-error";
 
 // generate tokens
@@ -121,16 +123,12 @@ export function decode_token(
 
 export async function refreshAccessToken(refreshToken: string) {
     try {
+        // decode refresh token
         const decoded = decode_token(refreshToken, "refresh");
 
-        // 1️⃣ Ambil data user & session dari DB
-        // const session = await SessionRepository.findBySid(decoded.sid);
-        const session  : { sid: string; revoked: boolean} = {
-            sid: decoded.sid,
-            revoked: false
-        };
-
-        if (!session || session?.revoked) {
+        // make sure session id is still valid
+        const session = await redis.get(`session:${decoded.sid}`);
+        if (!session) {
             throw new ResponseError({
                 status: 401,
                 code: "SESSION_INVALID",
@@ -138,13 +136,12 @@ export async function refreshAccessToken(refreshToken: string) {
             });
         }
 
-        // const user = await UserRepository.findById(decoded.sub);
-        const user = {
-            id: decoded.sub,
-            status: "active",
-            role: "user"
-        };
+        // get user by id
+        const query_find_user_by_id = `SELECT id, status, role FROM users WHERE id = $1`;
+        const result = await pg.query(query_find_user_by_id, [decoded.sub]);
+        const user = result.rows[0];
 
+        // make sure user is active
         if (!user || user.status !== "active") {
             throw new ResponseError({
                 status: 403,
@@ -153,7 +150,7 @@ export async function refreshAccessToken(refreshToken: string) {
             });
         }
 
-        // 2️⃣ Bangun access token baru dengan data TERKINI
+        // create payload
         const accessPayload = {
             sub: user.id,
             sid: decoded.sid,
@@ -163,12 +160,14 @@ export async function refreshAccessToken(refreshToken: string) {
             aud: JWT_CONFIG.AUDIENCE,
         };
 
-        const new_access_token = jwt.sign(accessPayload, JWT_CONFIG.ACCESS_TOKEN_SECRET, {
+        // create new access token
+        const token = jwt.sign(accessPayload, JWT_CONFIG.ACCESS_TOKEN_SECRET, {
             expiresIn: JWT_CONFIG.ACCESS_TOKEN_EXPIRY,
             algorithm: JWT_CONFIG.ALGORITHM,
         } as SignOptions);
 
-        return new_access_token;
+        // return
+        return token;
     } catch {
         throw new ResponseError({
             status: 401,
