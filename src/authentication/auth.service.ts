@@ -101,4 +101,30 @@ export default class AuthService {
         return response;
     }
 
+    static async logout(sid: string) {
+        const session = await redis.get(`session:${sid}`);
+
+        if (!session) {
+            throw new ResponseError({
+                status: 401,
+                code: "INVALID_SESSION",
+                message: "Invalid session. Please login again."
+            });
+        }
+
+        let payload: any;
+        try {
+            payload = JSON.parse(session);
+        } catch {
+            throw new ResponseError({
+                status: 401,
+                code: "INVALID_SESSION",
+                message: "Invalid session. Please login again."
+            });
+        }
+
+        await redis.del(`session:${sid}`);
+        return payload;
+    }
+
 }

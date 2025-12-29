@@ -99,6 +99,17 @@ export default class AuthController {
 
     static async logout(req: Request, res: Response, next: NextFunction) {
         try {
+            const user = (req as any).user;
+            await AuthService.logout(user.session_id);
+
+            res.clearCookie("refresh_token", cookieOptions);
+            res.clearCookie("authenticated", cookieOptions);
+
+            return new ResponseSuccess({
+                status: 200,
+                code: "LOGOUT_SUCCESS",
+                message: "Logout successful."
+            }).send(res);
 
         } catch (error) {
             next(error);
