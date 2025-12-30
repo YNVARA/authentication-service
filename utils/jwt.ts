@@ -11,18 +11,12 @@ import pg from "./pg";
 import ResponseError from "./response-error";
 
 // generate tokens
-export function generate_tokens(
-    user_id: string,
-    role: string,
-    status: string
-) {
+export function generate_tokens(user_id: string) {
     const session_id = randomUUID();
 
     const accessPayload = {
         sub: user_id,
         sid: session_id,
-        role,
-        status,
         iss: JWT_CONFIG.ISSUER,
         aud: JWT_CONFIG.AUDIENCE,
     };
@@ -41,7 +35,7 @@ export function generate_tokens(
             expiresIn: JWT_CONFIG.ACCESS_TOKEN_EXPIRY,
             algorithm: JWT_CONFIG.ALGORITHM,
         } as SignOptions
-        
+
     );
 
     const refresh_token = jwt.sign(
@@ -61,8 +55,6 @@ export function generate_tokens(
 export interface DecodedToken extends JwtPayload {
     sub: string;
     sid: string;
-    role?: string;
-    status?: string;
 }
 
 export function decode_token(
@@ -137,7 +129,7 @@ export async function refreshAccessToken(refreshToken: string) {
         }
 
         // get user by id
-        const query_find_user_by_id = `SELECT id, status, role FROM users WHERE id = $1`;
+        const query_find_user_by_id = `SELECT id, status FROM users WHERE id = $1`;
         const result = await pg.query(query_find_user_by_id, [decoded.sub]);
         const user = result.rows[0];
 
@@ -154,8 +146,6 @@ export async function refreshAccessToken(refreshToken: string) {
         const accessPayload = {
             sub: user.id,
             sid: decoded.sid,
-            role: user.role,
-            status: user.status,
             iss: JWT_CONFIG.ISSUER,
             aud: JWT_CONFIG.AUDIENCE,
         };

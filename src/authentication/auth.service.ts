@@ -78,7 +78,7 @@ export default class AuthService {
 
         await AuthRepository.update_last_login(response.id);
 
-        const token = generate_tokens(response.id, response.role, response.status);
+        const token = generate_tokens(response.id);
         const ttl = 60 * 60 * 24 * 7;
         const redis_payload = {
             sid: token.session_id,

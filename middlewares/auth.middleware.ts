@@ -8,11 +8,7 @@ import { cookieOptions } from "../utils/cookie";
 import ResponseError from "../utils/response-error";
 
 // initialize
-export default async function AuthMiddleware(
-    req: Request,
-    res: Response,
-    next: NextFunction
-) {
+export default async function AuthMiddleware(req: Request, res: Response, next: NextFunction) {
     try {
         const authHeader = req.headers.authorization;
         const token = authHeader?.split(" ")[1];
@@ -49,8 +45,6 @@ export default async function AuthMiddleware(
 
         (req as any).user = {
             id: decoded.sub,
-            role: decoded.role!,
-            status: decoded.status!,
             session_id: decoded.sid
         };
 

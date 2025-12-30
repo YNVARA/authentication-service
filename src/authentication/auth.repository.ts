@@ -45,7 +45,7 @@ export default class AuthRepository {
 
         if (is_email){
             const query = `
-                SELECT id, email, username, hash_password, role, status, email_verified_at, last_login_at
+                SELECT id, email, username, hash_password, status, email_verified_at, last_login_at
                 FROM users
                 WHERE email = $1
             `;
