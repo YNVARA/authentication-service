@@ -43,7 +43,7 @@ app.post("/auth/resend-email-verification", EmailVerificationController.resendEm
 // credential routes
 app.post("/auth/forgot-password", CredentialController.forgotPassword);
 app.post("/auth/reset-password", CredentialController.resetPassword);
-app.post("/auth/change-password", CredentialController.changePassword);
+app.patch("/auth/change-password", AuthMiddleware, CredentialController.changePassword);
 
 
 // account routes
