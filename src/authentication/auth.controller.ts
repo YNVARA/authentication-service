@@ -49,7 +49,7 @@ export default class AuthController {
                 status: 200,
                 code: "LOGIN_SUCCESS",
                 message: "login successful",
-                data: response
+                data: response.access_token
             }).send(res);
         } catch (error) {
             next(error);

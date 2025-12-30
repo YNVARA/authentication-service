@@ -7,9 +7,7 @@ import { decode_token } from "../utils/jwt";
 import { cookieOptions } from "../utils/cookie";
 import ResponseError from "../utils/response-error";
 
-// import config
-import { JWT_CONFIG } from "../config";
-
+// initialize
 export default async function AuthMiddleware(
     req: Request,
     res: Response,
