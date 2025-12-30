@@ -12,8 +12,10 @@ import ErrorMiddleware from './middlewares/error.middleware';
 
 
 // import routes
-import WellcomeContainer from './src/wellcome/wellcome.controller';
 import AuthController from './src/authentication/auth.controller';
+import AccountController from './src/account/account.controller';
+import CredentialController from './src/credential/credential.controller';
+import EmailVerificationController from './src/email-verification/email-verification.controller';
 
 
 // initialize
@@ -26,23 +28,29 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-// routes
-app.get("/", WellcomeContainer.index);
-
+// authentication routes
 app.post("/auth/register", AuthController.register);
 app.post("/auth/login", AuthController.login);
 app.get("/auth/token", AuthController.token);
 app.post("/auth/logout", AuthMiddleware, AuthController.logout);
 
-app.post("/auth/verify-email", AuthController.emailVerification);
-app.post("/auth/resend-email-verification", AuthController.resendEmailVerification);
-app.post("/auth/forgot-password", AuthController.forgotPassword);
-app.post("/auth/reset-password", AuthController.resetPassword);
-app.post("/auth/change-password", AuthController.changePassword);
-app.post("/auth/deactive-account", AuthController.deactiveAccount);
-app.post("/auth/reactivate-account", AuthController.reactivateAccount);
-app.post("/auth/delete-account", AuthController.deleteAccount);
-app.get("/auth/my-account", AuthMiddleware, AuthController.myAccount);
+
+// email verification routes
+app.post("/auth/verify-email", EmailVerificationController.emailVerification);
+app.post("/auth/resend-email-verification", EmailVerificationController.resendEmailVerification);
+
+
+// credential routes
+app.post("/auth/forgot-password", CredentialController.forgotPassword);
+app.post("/auth/reset-password", CredentialController.resetPassword);
+app.post("/auth/change-password", CredentialController.changePassword);
+
+
+// account routes
+app.post("/auth/deactive-account", AccountController.deactiveAccount);
+app.post("/auth/reactivate-account", AccountController.reactivateAccount);
+app.post("/auth/delete-account", AccountController.deleteAccount);
+app.get("/auth/my-account", AuthMiddleware, AccountController.myAccount);
 
 
 // middlewares

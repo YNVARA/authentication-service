@@ -1,2 +1,0 @@
-### WELLCOM - GET - INDEX
-GET http://{{hostname}}:{{port}}
