@@ -1,4 +1,5 @@
 // import utils
+import { date } from "zod";
 import pg from "../../utils/pg";
 
 // repository for handle authentication
@@ -30,12 +31,12 @@ export default class AuthRepository {
         hash_password: string
     }) {
         const query = `
-        INSERT INTO users (email, username, hash_password)
-        VALUES ($1, $2, $3)
-        RETURNING id, email, username, created_at
-    `;
-        const value = [data.email, data.username, data.hash_password];
-        const result = await pg.query(query, value);
+            INSERT INTO users (email, username, hash_password, status, email_verified_at)
+            VALUES ($1, $2, $3, $4, NOW())
+            RETURNING id, email, username, created_at
+        `;
+        const values = [data.email, data.username, data.hash_password, "active"];
+        const result = await pg.query(query, values);
         return result.rows[0];
     }
 
@@ -43,7 +44,7 @@ export default class AuthRepository {
         const is_email = data.email_or_username.includes("@");
         let response;
 
-        if (is_email){
+        if (is_email) {
             const query = `
                 SELECT id, email, username, hash_password, status, email_verified_at, last_login_at
                 FROM users
@@ -64,7 +65,7 @@ export default class AuthRepository {
         return response;
     }
 
-    static async update_last_login(id : string | number) {
+    static async update_last_login(id: string | number) {
         const query = `
             UPDATE users
             SET last_login_at = NOW()
