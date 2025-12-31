@@ -11,6 +11,10 @@ import AuthMiddleware from './middlewares/auth.middleware';
 import ErrorMiddleware from './middlewares/error.middleware';
 
 
+// import utils
+import limiter from './utils/rate-limit';
+
+
 // import routes
 import AuthController from './src/authentication/auth.controller';
 import AccountController from './src/account/account.controller';
@@ -29,10 +33,10 @@ app.use(express.urlencoded({ extended: true }));
 
 
 // authentication routes
-app.post("/auth/register", AuthController.register);                                                // ✅
-app.post("/auth/login", AuthController.login);                                                      // ✅
-app.get("/auth/token", AuthController.token);                                                       // ✅
-app.post("/auth/logout", AuthMiddleware, AuthController.logout);                                    // ✅
+app.post("/auth/register", limiter(10, 3), AuthController.register);                                // ✅
+app.post("/auth/login", limiter(1, 5), AuthController.login);                                       // ✅
+app.get("/auth/token", limiter(1, 20), AuthController.token);                                       // ✅
+app.post("/auth/logout", limiter(1, 30), AuthMiddleware, AuthController.logout);                    // ✅
 
 
 // email verification routes
