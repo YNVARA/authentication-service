@@ -11,6 +11,12 @@ git clone https://github.com/Styxian-Legion/auth-service.git
 cd auth-service
 ```
 
+## Requrements
+
+- PostgreSQL
+- Redis
+- Bun (for development)
+
 ## Local Development
 
 1. Copy the example environment file:
@@ -66,6 +72,7 @@ bun run dev
 Run the service in a Docker container:
 
 ```bash
+docker build -t auth-service:latest .
 docker build -t auth-service:0.0.1 -t auth-service:latest .
 ```
 
@@ -120,3 +127,79 @@ docker run -d \
 - Make sure PostgreSQL and Redis are running locally or accessible from Docker.
 - Keep JWT secrets secure and never commit them to the repository.
 - This service is intended to be used behind an API Gateway in a microservices architecture.
+
+## Endpoints
+
+### Authentication
+
+```
+NAME        : REGISTER
+METHOD      : POST
+ENDPOINT    : /auth/register
+RATE LIMIT  : 3 request / 10 minutes
+BODY        : email, username, password, confirm_password
+```
+
+```
+NAME        : LOGIN
+METHOD      : POST
+ENDPOINT    : /auth/login
+RATE LIMIT  : 5 request / 1 minutes
+BODY        : email_or_username, password
+```
+
+```
+NAME        : GET NEW ACCESS TOKEN
+METHOD      : GET
+ENDPOINT    : /auth/token
+RATE LIMIT  : 20 request / 1 minutes
+```
+
+```
+NAME        : LOGOUT
+METHOD      : POST
+ENDPOINT    : /auth/logout
+RATE LIMIT  : 30 request / 1 minutes
+```
+
+### Credential
+
+```
+NAME        : CHANGE PASSWORD
+METHOD      : POST
+ENDPOINT    : /auth/change-password
+BODY        : old_password, new_password, confirm_password
+```
+
+### Account
+
+```
+NAME        : GET MY ACCOUNT
+METHOD      : GET
+ENDPOINT    : /auth/my-account
+AUTHORIZE   : Bearer <access_token>
+```
+
+```
+NAME        : DEACTIVE ACCOUNT
+METHOD      : POST
+ENDPOINT    : /auth/deactive-account
+AUTHORIZE   : Bearer <access_token>
+BODY        : password
+```
+
+```
+NAME        : DELETE ACCOUNT
+METHOD      : POST
+ENDPOINT    : /auth/delete-account
+AUTHORIZE   : Bearer <access_token>
+BODY        : password
+```
+
+```
+NAME        : UPDATE USERNAME
+METHOD      : PATCH
+ENDPOINT    : /auth/update-username
+AUTHORIZE   : Bearer <access_token>
+BODY        : username
+```
