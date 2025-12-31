@@ -71,11 +71,14 @@ export default class AccountController {
 
     static async myAccount(req: Request, res: Response, next: NextFunction) {
         try {
+            const user = (req as any).user;
+            const response = await AccountService.get_my_profile(user.id);
+
             return res.status(200).json({
                 status: 200,
-                code: "TOKEN_SUCCESS",
-                message: "token successful",
-                data: "token successful"
+                code: "GET_MY_ACCOUNT_SUCCESS",
+                message: "get my account successful",
+                data: response
             });
         } catch (error) {
             next(error);

@@ -26,7 +26,18 @@ export default class AccountRepository {
         `;
         const value = [data.user_id, data.status];
         const result = await pg.query(query, value);
-        return result.rows[0];   
+        return result.rows[0];
+    }
+
+    static async get_my_account(user_id: string | number) {
+        const query = `
+            SELECT id, email, username, status, email_verified_at, created_at
+            FROM users
+            WHERE id = $1
+        `;
+        const value = [user_id];
+        const result = await pg.query(query, value);
+        return result.rows[0];
     }
 
 }
