@@ -16,8 +16,8 @@ import limiter from './utils/rate-limit';
 
 
 // import routes
-import AuthController from './src/authentication/auth.controller';
 import AccountController from './src/account/account.controller';
+import AuthController from './src/authentication/auth.controller';
 import CredentialController from './src/credential/credential.controller';
 import EmailVerificationController from './src/email-verification/email-verification.controller';
 
@@ -56,7 +56,6 @@ app.post("/auth/deactive-account", AuthMiddleware, AccountController.deactiveAcc
 app.post("/auth/reactivate-account", AccountController.reactivateAccount);                          // ❌
 app.post("/auth/delete-account", AuthMiddleware, AccountController.deleteAccount);                  // ✅
 app.patch("/auth/update-username", AuthMiddleware, AccountController.updateUsername);               // ✅
-
 
 // middlewares
 app.use(ErrorMiddleware);
