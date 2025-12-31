@@ -95,9 +95,9 @@ export default class AuthService {
 
             case "deleted":
                 throw new ResponseError({
-                    status: 410,
-                    code: "ACCOUNT_DELETED",
-                    message: "This account has been permanently deleted."
+                    status: 401,
+                    code: "INVALID_CREDENTIALS",
+                    message: "Invalid email/username or password."
                 });
 
             case "active":
