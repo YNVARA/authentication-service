@@ -18,7 +18,6 @@ CREATE TABLE users (
     email VARCHAR(255) NOT NULL UNIQUE,
     username VARCHAR(100) NOT NULL UNIQUE,
     hash_password VARCHAR(255) NOT NULL,
-    role VARCHAR(50) DEFAULT 'user',
     status user_status DEFAULT 'pending',
     
     -- Audit kolom untuk verifikasi dan login
