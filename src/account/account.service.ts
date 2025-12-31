@@ -82,4 +82,32 @@ export default class AccountService {
         return response;
     }
 
+    static async update_username(data: {
+        user_id: string | number,
+        username: string
+    }) {
+        const current = await AccountRepository.check_current_username(data.user_id)
+        if (current.username === data.username) {
+            throw new ResponseError({
+                status: 400,
+                code: "USERNAME_SAME",
+                message: "new username must be different."
+            });
+        }
+
+        const exist = await AccountRepository.username_is_exist(data.username);
+        if (exist) {
+            throw new ResponseError({
+                status: 409,
+                code: "USERNAME_TAKEN",
+                message: "Username already in use."
+            });
+        }
+
+        return await AccountRepository.update_username({
+            user_id: data.user_id,
+            username: data.username
+        });
+    }
+
 }

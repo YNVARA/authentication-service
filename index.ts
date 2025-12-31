@@ -37,7 +37,7 @@ app.post("/auth/logout", AuthMiddleware, AuthController.logout);                
 
 // email verification routes
 app.post("/auth/verify-email", EmailVerificationController.emailVerification);                      // ❌
-app.post("/auth/resend-email-verification", EmailVerificationController.resendEmailVerification);   // ❌
+app.post("/auth/resend-email-verification", EmailVerificationController.resendEmailVerification);   // ❌ 
 
 
 // credential routes
@@ -51,6 +51,7 @@ app.get("/auth/my-account", AuthMiddleware, AccountController.myAccount);       
 app.post("/auth/deactive-account", AuthMiddleware, AccountController.deactiveAccount);              // ✅
 app.post("/auth/reactivate-account", AccountController.reactivateAccount);                          // ❌
 app.post("/auth/delete-account", AuthMiddleware, AccountController.deleteAccount);                  // ✅
+app.patch("/auth/update-username", AuthMiddleware, AccountController.updateUsername);               // ✅
 
 
 // middlewares

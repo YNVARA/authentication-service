@@ -3,7 +3,7 @@ import type { Request, Response, NextFunction } from "express";
 
 // validation & schema validation
 import Validation from "../../utils/validation";
-import { ConfirmDeactiveAccountSchema, ConfirmDeleteAccountSchema } from "./account.validator";
+import { ConfirmDeactiveAccountSchema, ConfirmDeleteAccountSchema, UpdateUsernameSchema } from "./account.validator";
 
 // services
 import AccountService from "./account.service";
@@ -78,6 +78,26 @@ export default class AccountController {
                 status: 200,
                 code: "GET_MY_ACCOUNT_SUCCESS",
                 message: "get my account successful",
+                data: response
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async updateUsername(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { data } = await Validation(UpdateUsernameSchema, req.body);
+            const user = (req as any).user;
+            const response = await AccountService.update_username({
+                user_id: user.id,
+                username: data.username
+            });
+
+            return res.status(200).json({
+                status: 200,
+                code: "CHANGE_USERNAME_SUCCESS",
+                message: "change username successful",
                 data: response
             });
         } catch (error) {
