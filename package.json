@@ -29,6 +29,7 @@
         "express": "^5.2.1",
         "express-rate-limit": "^8.2.1",
         "ioredis": "^5.8.2",
+        "javascript-obfuscator": "^5.1.0",
         "jsonwebtoken": "^9.0.3",
         "node-vault": "^0.10.9",
         "pg": "^8.16.3",
