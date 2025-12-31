@@ -1,10 +1,37 @@
 // import dependencies
 import type { Request, Response, NextFunction } from "express";
 
+// validation & schema validation
+import Validation from "../../utils/validation";
+import { ConfirmDeactiveAccountSchema } from "./account.validator";
+
+// services
+import AccountService from "./account.service";
+
+// utils
+import { cookieOptions } from "../../utils/cookie";
+import ResponseSuccess from "../../utils/response-success";
+
 export default class AccountController {
     static async deactiveAccount(req: Request, res: Response, next: NextFunction) {
         try {
+            const { data } = await Validation(ConfirmDeactiveAccountSchema, req.body);
+            const user = (req as any).user;
 
+            await AccountService.deactive_account({
+                user_id: user.id,
+                session_id: user.session_id,
+                password: data.password
+            });
+
+            res.clearCookie("refresh_token", cookieOptions);
+            res.clearCookie("authenticated", cookieOptions);
+
+            return new ResponseSuccess({
+                status: 200,
+                code: "DEACTIVE_ACCOUNT_SUCCESS",
+                message: "deactive account successful"
+            }).send(res);
         } catch (error) {
             next(error);
         }

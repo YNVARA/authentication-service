@@ -6,7 +6,7 @@ import AuthRepository from "./auth.repository";
 
 // import utils
 import ResponseError from "../../utils/response-error";
-import { generate_tokens, decode_token, refreshAccessToken } from "../../utils/jwt";
+import { generate_tokens, refreshAccessToken } from "../../utils/jwt";
 import { redis } from "../../utils/redis";
 
 // service for handle authentication
@@ -54,14 +54,15 @@ export default class AuthService {
         ip: string,
         ua: string
     }) {
+        // find user
         const response = await AuthRepository.login(data);
-
         if (!response) throw new ResponseError({
             status: 401,
             code: "INVALID_CREDENTIALS",
             message: "Invalid email/username or password."
         });
 
+        // validate password
         const is_password_valid = await argon2.verify(response.hash_password, data.password);
         if (!is_password_valid) throw new ResponseError({
             status: 401,
@@ -69,16 +70,63 @@ export default class AuthService {
             message: "Invalid email/username or password."
         });
 
-        const is_active_and_verified = response.status === "active" && response.email_verified_at !== null;
-        if (!is_active_and_verified) throw new ResponseError({
-            status: 403,
-            code: "ACCOUNT_NOT_READY",
-            message: "Your account is not active. Please verify your email before logging in."
-        });
+        // validate status
+        switch (response.status) {
+            case "pending":
+                throw new ResponseError({
+                    status: 403,
+                    code: "ACCOUNT_PENDING",
+                    message: "Your account is pending verification. Please verify your email."
+                });
 
+            case "suspend":
+                throw new ResponseError({
+                    status: 403,
+                    code: "ACCOUNT_SUSPENDED",
+                    message: "Your account has been suspended. Please contact support."
+                });
+
+            case "inactive":
+                throw new ResponseError({
+                    status: 403,
+                    code: "ACCOUNT_INACTIVE",
+                    message: "Your account is inactive. Please contact support."
+                });
+
+            case "deleted":
+                throw new ResponseError({
+                    status: 410,
+                    code: "ACCOUNT_DELETED",
+                    message: "This account has been permanently deleted."
+                });
+
+            case "active":
+                break;
+
+            default:
+                throw new ResponseError({
+                    status: 403,
+                    code: "ACCOUNT_INVALID_STATE",
+                    message: "Account is in an invalid state."
+                });
+        }
+
+        // validate email verification
+        if (!response.email_verified_at) {
+            throw new ResponseError({
+                status: 403,
+                code: "EMAIL_NOT_VERIFIED",
+                message: "Please verify your email before logging in."
+            });
+        }
+
+        // update last login
         await AuthRepository.update_last_login(response.id);
 
+        // create token
         const token = generate_tokens(response.id);
+
+        // create session
         const ttl = 60 * 60 * 24 * 7;
         const redis_payload = {
             sid: token.session_id,
@@ -88,12 +136,11 @@ export default class AuthService {
         }
         await redis.set(`session:${token.session_id}`, JSON.stringify(redis_payload), "EX", ttl);
 
-        const response_payload = {
+        // return token
+        return {
             access_token: token.access_token,
             refresh_token: token.refresh_token
-        }
-
-        return response_payload;
+        };
     }
 
     static async refresh_token(token: string) {
