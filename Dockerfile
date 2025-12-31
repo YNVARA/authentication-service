@@ -6,10 +6,10 @@ WORKDIR /app
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
-# Copy source code
+# Copy seluruh source code (termasuk schema.sql)
 COPY . .
 
-# Jalankan script build (dist/index.min.js)
+# Jalankan script build (menghasilkan folder dist)
 RUN bun run build
 
 # STAGE 2: Runtime
@@ -20,6 +20,7 @@ WORKDIR /app
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package.json .
 COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/schema.sql ./schema.sql
 
 # Expose port sesuai .env kamu
 EXPOSE 4000
