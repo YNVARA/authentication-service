@@ -3,7 +3,7 @@ import type { Request, Response, NextFunction } from "express";
 
 // validation & schema validation
 import Validation from "../../utils/validation";
-import { ConfirmDeactiveAccountSchema } from "./account.validator";
+import { ConfirmDeactiveAccountSchema, ConfirmDeleteAccountSchema } from "./account.validator";
 
 // services
 import AccountService from "./account.service";
@@ -47,7 +47,23 @@ export default class AccountController {
 
     static async deleteAccount(req: Request, res: Response, next: NextFunction) {
         try {
+            const { data } = await Validation(ConfirmDeleteAccountSchema, req.body);
+            const user = (req as any).user;
 
+            await AccountService.delete_account({
+                user_id: user.id,
+                session_id: user.session_id,
+                password: data.password
+            });
+
+            res.clearCookie("refresh_token", cookieOptions);
+            res.clearCookie("authenticated", cookieOptions);
+
+            return new ResponseSuccess({
+                status: 200,
+                code: "DELETE_ACCOUNT_SUCCESS",
+                message: "delete account successful"
+            }).send(res);
         } catch (error) {
             next(error);
         }

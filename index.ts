@@ -47,10 +47,10 @@ app.patch("/auth/change-password", AuthMiddleware, CredentialController.changePa
 
 
 // account routes
+app.get("/auth/my-account", AuthMiddleware, AccountController.myAccount);                           // ❌
 app.post("/auth/deactive-account", AuthMiddleware, AccountController.deactiveAccount);              // ✅
 app.post("/auth/reactivate-account", AccountController.reactivateAccount);                          // ❌
-app.post("/auth/delete-account", AccountController.deleteAccount);                                  // ❌
-app.get("/auth/my-account", AuthMiddleware, AccountController.myAccount);                           // ❌
+app.post("/auth/delete-account", AuthMiddleware, AccountController.deleteAccount);                  // ✅
 
 
 // middlewares
