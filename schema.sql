@@ -11,14 +11,16 @@ END$$;
 -- ==========================================
 -- 2. TABLE: users
 -- ==========================================
-
 CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY
 );
 
--- Columns (auto upgrade)
 DO $$
 BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='public_id') THEN
+        ALTER TABLE users ADD COLUMN public_id VARCHAR(32) NOT NULL UNIQUE;
+    END IF;
+
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='email') THEN
         ALTER TABLE users ADD COLUMN email VARCHAR(255) NOT NULL UNIQUE;
     END IF;
@@ -59,13 +61,16 @@ END$$;
 -- ==========================================
 -- 3. TABLE: authentication_tokens
 -- ==========================================
-
 CREATE TABLE IF NOT EXISTS authentication_tokens (
     id BIGSERIAL PRIMARY KEY
 );
 
 DO $$
 BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='authentication_tokens' AND column_name='public_id') THEN
+        ALTER TABLE authentication_tokens ADD COLUMN public_id VARCHAR(32) NOT NULL UNIQUE;
+    END IF;
+
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='authentication_tokens' AND column_name='user_id') THEN
         ALTER TABLE authentication_tokens ADD COLUMN user_id BIGINT NOT NULL;
     END IF;
@@ -91,7 +96,9 @@ BEGIN
     END IF;
 END$$;
 
--- Foreign key (safe)
+-- ==========================================
+-- 4. FOREIGN KEY (SAFE)
+-- ==========================================
 DO $$
 BEGIN
     IF NOT EXISTS (
@@ -107,8 +114,11 @@ BEGIN
 END$$;
 
 -- ==========================================
--- 4. INDEXING (SAFE)
+-- 5. INDEXING (SAFE)
 -- ==========================================
+CREATE INDEX IF NOT EXISTS idx_users_public_id ON users(public_id);
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+
+CREATE INDEX IF NOT EXISTS idx_auth_tokens_public_id ON authentication_tokens(public_id);
 CREATE INDEX IF NOT EXISTS idx_auth_tokens_hash ON authentication_tokens(token_hash);

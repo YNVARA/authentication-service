@@ -124,7 +124,7 @@ export default class AuthService {
         await AuthRepository.update_last_login(response.id);
 
         // create token
-        const token = generate_tokens(response.id);
+        const token = generate_tokens(response.public_id);
 
         // create session
         const ttl = 60 * 60 * 24 * 7;

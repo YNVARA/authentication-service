@@ -11,18 +11,18 @@ import pg from "./pg";
 import ResponseError from "./response-error";
 
 // generate tokens
-export function generate_tokens(user_id: string) {
+export function generate_tokens(public_user_id: string) {
     const session_id = randomUUID();
 
     const accessPayload = {
-        sub: user_id,
+        sub: public_user_id,
         sid: session_id,
         iss: JWT_CONFIG.ISSUER,
         aud: JWT_CONFIG.AUDIENCE,
     };
 
     const refreshPayload = {
-        sub: user_id,
+        sub: public_user_id,
         sid: session_id,
         iss: JWT_CONFIG.ISSUER,
         aud: JWT_CONFIG.AUDIENCE,

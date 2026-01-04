@@ -1,5 +1,5 @@
 // import utils
-import { date } from "zod";
+import generatePublicId from "../../utils/generate-public-id";
 import pg from "../../utils/pg";
 
 // repository for handle authentication
@@ -31,11 +31,11 @@ export default class AuthRepository {
         hash_password: string
     }) {
         const query = `
-            INSERT INTO users (email, username, hash_password, status, email_verified_at)
-            VALUES ($1, $2, $3, $4, NOW())
-            RETURNING id, email, username, created_at
+            INSERT INTO users (public_id, email, username, hash_password, status, email_verified_at)
+            VALUES ($1, $2, $3, $4, $5, NOW())
+            RETURNING public_id, email, username, created_at
         `;
-        const values = [data.email, data.username, data.hash_password, "active"];
+        const values = [generatePublicId(), data.email, data.username, data.hash_password, "active"];
         const result = await pg.query(query, values);
         return result.rows[0];
     }
@@ -46,7 +46,7 @@ export default class AuthRepository {
 
         if (is_email) {
             const query = `
-                SELECT id, email, username, hash_password, status, email_verified_at, last_login_at
+                SELECT id, public_id, email, username, hash_password, status, email_verified_at
                 FROM users
                 WHERE email = $1
             `;
@@ -54,7 +54,7 @@ export default class AuthRepository {
             response = result.rows[0];
         } else {
             const query = `
-                SELECT id, email, username, hash_password, role, status, email_verified_at, last_login_at
+                SELECT id, public_id, email, username, hash_password, role, status, email_verified_at
                 FROM users
                 WHERE username = $1
             `;
