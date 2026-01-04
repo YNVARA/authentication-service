@@ -90,7 +90,7 @@ export default class AccountController {
             const { data } = await Validation(UpdateUsernameSchema, req.body);
             const user = (req as any).user;
             const response = await AccountService.update_username({
-                user_id: user.id,
+                public_user_id: user.public_id,
                 username: data.username
             });
 

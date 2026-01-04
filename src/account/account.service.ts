@@ -83,10 +83,10 @@ export default class AccountService {
     }
 
     static async update_username(data: {
-        user_id: string | number,
+        public_user_id: string | number,
         username: string
     }) {
-        const current = await AccountRepository.check_current_username(data.user_id)
+        const current = await AccountRepository.check_current_username(data.public_user_id)
         if (current.username === data.username) {
             throw new ResponseError({
                 status: 400,
@@ -105,7 +105,7 @@ export default class AccountService {
         }
 
         return await AccountRepository.update_username({
-            user_id: data.user_id,
+            public_user_id: data.public_user_id,
             username: data.username
         });
     }

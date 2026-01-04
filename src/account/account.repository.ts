@@ -40,13 +40,13 @@ export default class AccountRepository {
         return result.rows[0];
     }
 
-    static async check_current_username(user_id: string | number) {
+    static async check_current_username(public_user_id: string | number) {
         const query = `
             SELECT username
             FROM users
-            WHERE id = $1
+            WHERE public_id = $1
         `;
-        const value = [user_id];
+        const value = [public_user_id];
         const result = await pg.query(query, value);
         return result.rows[0];
     }
@@ -63,15 +63,15 @@ export default class AccountRepository {
     }
 
     static async update_username(data: {
-        user_id: string | number,
+        public_user_id: string | number,
         username: string
     }){
         const query = `
             UPDATE users
             SET username = $2
-            WHERE id = $1
+            WHERE public_id = $1
         `;
-        const value = [data.user_id, data.username];
+        const value = [data.public_user_id, data.username];
         const result = await pg.query(query, value);
         return result.rows[0];
     }
