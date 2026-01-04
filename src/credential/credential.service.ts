@@ -11,11 +11,11 @@ import ResponseError from "../../utils/response-error";
 export default class CredentialService {
 
     static async change_password(data : {
-        user_id: string,
+        public_user_id: string,
         old_password: string,
         new_password: string
     }){
-        const old_password_data = await CredentialRepository.validation_old_password(data.user_id);
+        const old_password_data = await CredentialRepository.validation_old_password(data.public_user_id);
         const is_old_password_valid = await argon2.verify(old_password_data.hash_password, data.old_password);
 
         if (!is_old_password_valid) throw new ResponseError({
@@ -26,7 +26,7 @@ export default class CredentialService {
 
         const hash_password = await argon2.hash(data.new_password);
         return await CredentialRepository.update_password({
-            user_id: data.user_id,
+            public_user_id: data.public_user_id,
             hash_password: hash_password
         });
     }

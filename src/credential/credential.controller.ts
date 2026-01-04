@@ -34,7 +34,7 @@ export default class CredentialController {
             const user = (req as any).user;
 
             await CredentialService.change_password({
-                user_id: user.id,
+                public_user_id: user.public_id,
                 old_password: data.old_password,
                 new_password: data.new_password
             });

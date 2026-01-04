@@ -44,7 +44,7 @@ export default async function AuthMiddleware(req: Request, res: Response, next: 
         }
 
         (req as any).user = {
-            id: decoded.sub,
+            public_id: decoded.sub,
             session_id: decoded.sid
         };
 
