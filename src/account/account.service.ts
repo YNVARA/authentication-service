@@ -12,11 +12,11 @@ import { redis } from "../../utils/redis";
 export default class AccountService {
 
     static async deactive_account(data: {
-        user_id: string,
+        public_user_id: string,
         session_id: string,
         password: string
     }) {
-        const password_user = await AccountRepository.password_validation_by_user_id(data.user_id);
+        const password_user = await AccountRepository.password_validation_by_user_id(data.public_user_id);
         const is_password_valid = await argon2.verify(password_user.hash_password, data.password);
 
         if (!is_password_valid) throw new ResponseError({
@@ -26,7 +26,7 @@ export default class AccountService {
         });
 
         const response = await AccountRepository.update_status_user({
-            user_id: data.user_id,
+            public_user_id: data.public_user_id,
             status: "inactive"
         });
 
@@ -59,7 +59,7 @@ export default class AccountService {
         });
 
         const response = await AccountRepository.update_status_user({
-            user_id: data.user_id,
+            public_user_id: data.user_id,
             status: "deleted"
         });
 

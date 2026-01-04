@@ -19,7 +19,7 @@ export default class AccountController {
             const user = (req as any).user;
 
             await AccountService.deactive_account({
-                user_id: user.id,
+                public_user_id: user.public_id,
                 session_id: user.session_id,
                 password: data.password
             });
