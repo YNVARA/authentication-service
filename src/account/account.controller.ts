@@ -72,7 +72,7 @@ export default class AccountController {
     static async myAccount(req: Request, res: Response, next: NextFunction) {
         try {
             const user = (req as any).user;
-            const response = await AccountService.get_my_profile(user.id);
+            const response = await AccountService.get_my_profile(user.public_id);
 
             return res.status(200).json({
                 status: 200,

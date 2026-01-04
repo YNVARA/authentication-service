@@ -29,13 +29,13 @@ export default class AccountRepository {
         return result.rows[0];
     }
 
-    static async get_my_account(user_id: string | number) {
+    static async get_my_account(public_user_id: string | number) {
         const query = `
-            SELECT id, email, username, status, email_verified_at, created_at
+            SELECT public_id, email, username, status, email_verified_at, created_at
             FROM users
-            WHERE id = $1
+            WHERE public_id = $1
         `;
-        const value = [user_id];
+        const value = [public_user_id];
         const result = await pg.query(query, value);
         return result.rows[0];
     }

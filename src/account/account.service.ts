@@ -77,8 +77,8 @@ export default class AccountService {
         return response;
     }
 
-    static async get_my_profile(user_id: string | number) {
-        const response = await AccountRepository.get_my_account(user_id);
+    static async get_my_profile(public_user_id: string | number) {
+        const response = await AccountRepository.get_my_account(public_user_id);
         return response;
     }
 
