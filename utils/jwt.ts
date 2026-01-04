@@ -129,7 +129,7 @@ export async function refreshAccessToken(refreshToken: string) {
         }
 
         // get user by id
-        const query_find_user_by_id = `SELECT id, status FROM users WHERE id = $1`;
+        const query_find_user_by_id = `SELECT public_id, status FROM users WHERE public_id = $1`;
         const result = await pg.query(query_find_user_by_id, [decoded.sub]);
         const user = result.rows[0];
 
@@ -144,7 +144,7 @@ export async function refreshAccessToken(refreshToken: string) {
 
         // create payload
         const accessPayload = {
-            sub: user.id,
+            sub: user.public_id,
             sid: decoded.sid,
             iss: JWT_CONFIG.ISSUER,
             aud: JWT_CONFIG.AUDIENCE,
