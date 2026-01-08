@@ -36,7 +36,7 @@ async function bootstrap() {
     app.post("/auth/logout", limiter(1, 30), AuthMiddleware, AuthController.logout);
 
     // Email verification
-    app.post("/auth/verify-email", EmailVerificationController.emailVerification);
+    app.get("/auth/verify-email", EmailVerificationController.emailVerification);
     app.post("/auth/resend-email-verification", EmailVerificationController.resendEmailVerification);
 
     // Credentials
