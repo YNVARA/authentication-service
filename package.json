@@ -17,6 +17,7 @@
         "@types/cookie-parser": "^1.4.10",
         "@types/express": "^5.0.6",
         "@types/jsonwebtoken": "^9.0.10",
+        "@types/nodemailer": "^7.0.4",
         "@types/pg": "^8.16.0"
     },
     "peerDependencies": {
@@ -33,6 +34,7 @@
         "javascript-obfuscator": "^5.1.0",
         "jsonwebtoken": "^9.0.3",
         "node-vault": "^0.10.9",
+        "nodemailer": "^7.0.12",
         "pg": "^8.16.3",
         "zod": "^4.2.1"
     }

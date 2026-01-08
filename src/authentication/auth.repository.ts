@@ -33,9 +33,9 @@ export default class AuthRepository {
         const query = `
             INSERT INTO users (public_id, email, username, hash_password, status, email_verified_at)
             VALUES ($1, $2, $3, $4, $5, NOW())
-            RETURNING public_id, email, username, created_at
+            RETURNING id, public_id, email, username, created_at
         `;
-        const values = [generatePublicId(), data.email, data.username, data.hash_password, "active"];
+        const values = [generatePublicId(), data.email, data.username, data.hash_password, "pending"];
         const result = await pg.query(query, values);
         return result.rows[0];
     }
@@ -73,6 +73,16 @@ export default class AuthRepository {
         `;
         const value = [id];
         const result = await pg.query(query, value);
+        return result.rows[0];
+    }
+
+    static async store_token_for_email_verification(data : {user_id: string | number, token_hash: string, expires_at: Date}) {
+        const query = `
+            INSERT INTO authentication_tokens (public_id, user_id, token_hash, token_type, expires_at)
+            VALUES ($1, $2, $3, $4, $5)
+        `;
+        const values = [generatePublicId(), data.user_id, data.token_hash, "email_verification", data.expires_at];
+        const result = await pg.query(query, values);
         return result.rows[0];
     }
 

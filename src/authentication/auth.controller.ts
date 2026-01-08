@@ -26,7 +26,12 @@ export default class AuthController {
                 status: 201,
                 code: "REGISTRATION_SUCCESS",
                 message: "registration successful. We have sent a verification link to your email. Please verify your account to continue.",
-                data: response
+                data: {
+                    public_id: response.public_id,
+                    email: response.email,
+                    username: response.username,
+                    created_at: response.created_at
+                }
             }).send(res);
         } catch (error) {
             next(error);

@@ -4,9 +4,14 @@ import argon2 from "argon2";
 // import repository
 import AuthRepository from "./auth.repository";
 
+// import config
+import { APP_CONFIG } from "../../config";
+
 // import utils
-import ResponseError from "../../utils/response-error";
 import { generate_tokens, refreshAccessToken } from "../../utils/jwt";
+import generate_token_hash from "../../utils/token-hash";
+import ResponseError from "../../utils/response-error";
+import sendEmail from "../../utils/mailer";
 import { redis } from "../../utils/redis";
 
 // service for handle authentication
@@ -18,9 +23,11 @@ export default class AuthService {
         password: string,
         confirm_password: string
     }) {
+        // check if email or username already exists
         const emailExists = await AuthRepository.count_email(data.email);
         const usernameExists = await AuthRepository.count_username(data.username);
 
+        // throw error if exists
         if (emailExists > 0 || usernameExists > 0) {
             throw new ResponseError({
                 status: 409,
@@ -29,6 +36,7 @@ export default class AuthService {
             });
         }
 
+        // validate password match
         if (data.password !== data.confirm_password) {
             throw new ResponseError({
                 status: 400,
@@ -37,15 +45,80 @@ export default class AuthService {
             });
         }
 
+        // hash password
         const hash_password = await argon2.hash(data.password);
 
-        const payload = {
+        // create user
+        const response = await AuthRepository.create_user({
             email: data.email,
             username: data.username,
             hash_password: hash_password
-        };
+        });
 
-        return await AuthRepository.create_user(payload);
+        // generate token hash for email verification
+        const token_hash = generate_token_hash();
+
+        // store token for email verification in database
+        await AuthRepository.store_token_for_email_verification({
+            user_id: response.id,
+            token_hash: token_hash.hashed_token,
+            expires_at: token_hash.expires_at
+        });
+
+        await sendEmail({
+            to: response.email,
+            subject: "Verifikasi Akun",
+            html: `
+            <div style="background:#f1f5f9;padding:40px 0;font-family:Arial,Helvetica,sans-serif">
+                <div style="max-width:600px;margin:auto;background:#ffffff;border-radius:10px;overflow:hidden;box-shadow:0 10px 25px rgba(0,0,0,0.05)">
+                    
+                    <div style="background:#020617;padding:28px;text-align:center">
+                        <h1 style="color:#ffffff;margin:0;font-size:22px">${APP_CONFIG.NAME}</h1>
+                    </div>
+
+                    <div style="padding:36px;color:#0f172a">
+                        <h2 style="margin-top:0">Verifikasi Email Anda</h2>
+
+                        <p style="font-size:15px;line-height:1.7;color:#334155">
+                            Terima kasih telah mendaftar di <strong>${APP_CONFIG.NAME}</strong>.
+                            Untuk mengaktifkan akun Anda, silakan salin token verifikasi di bawah ini
+                            lalu masukkan pada halaman verifikasi aplikasi.
+                        </p>
+
+                        <div style="background:#0f172a;border-radius:8px;padding:16px;margin:28px 0;text-align:center">
+                            <p style="margin:0;font-size:12px;color:#94a3b8">TOKEN VERIFIKASI</p>
+                            <p style="margin:8px 0 0 0;font-size:18px;letter-spacing:1px;font-weight:600;color:#e5e7eb">
+                                ${token_hash.hashed_token}
+                            </p>
+                        </div>
+
+                        <div style="background:#f8fafc;border-radius:8px;padding:16px;margin-top:12px">
+                            <p style="margin:0;font-size:13px;color:#475569">Token berlaku hingga:</p>
+                            <p style="margin:6px 0 0 0;font-size:14px;font-weight:600;color:#020617">
+                                ${token_hash.expires_at.toLocaleString("id-ID")}
+                            </p>
+                        </div>
+
+                        <p style="margin-top:28px;font-size:13px;color:#475569;line-height:1.6">
+                            Demi keamanan, jangan bagikan token ini kepada siapa pun. 
+                            Jika Anda tidak merasa mendaftarkan akun ini, silakan abaikan email ini.
+                        </p>
+
+                        <p style="margin-top:32px;font-size:13px;color:#475569">
+                            Salam,<br/>
+                            <strong>Tim ${APP_CONFIG.NAME}</strong>
+                        </p>
+                    </div>
+
+                    <div style="background:#f1f5f9;text-align:center;padding:16px;font-size:12px;color:#64748b">
+                        © ${new Date().getFullYear()} ${APP_CONFIG.NAME} · All rights reserved
+                    </div>
+                </div>
+            </div>
+            `
+        });
+
+        return response;
     }
 
     static async login(data: {
