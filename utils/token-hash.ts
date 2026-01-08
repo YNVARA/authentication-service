@@ -1,22 +1,12 @@
 import crypto from "crypto";
 
-const generate_token_hash = () => {
-    // Token yang dikirim ke user
-    const token = crypto.randomBytes(32).toString("hex");
+export const generate_token_hash = () => {
+    const token = crypto.randomBytes(32).toString("hex");                           // dikirim ke user
+    const hashed_token = crypto.createHash("sha256").update(token).digest("hex");   // simpan di DB
+    const expires_at = new Date(Date.now() + 15 * 60 * 1000);                       // expired (15 menit)
+    return { token, hashed_token, expires_at };
+};
 
-    // Hash yang disimpan di database
-    const hashed_token = crypto
-        .createHash("sha256")
-        .update(token)
-        .digest("hex");
-
-    // Masa berlaku token (misal 15 menit)
-    const expires_at = new Date(Date.now() + 15 * 60 * 1000);
-
-    return {
-        hashed_token,
-        expires_at
-    };
+export const hash_token = (token: string) => {
+    return crypto.createHash("sha256").update(token).digest("hex");
 }
-
-export default generate_token_hash;

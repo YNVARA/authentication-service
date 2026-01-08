@@ -9,7 +9,7 @@ import { APP_CONFIG } from "../../config";
 
 // import utils
 import { generate_tokens, refreshAccessToken } from "../../utils/jwt";
-import generate_token_hash from "../../utils/token-hash";
+import { generate_token_hash } from "../../utils/token-hash";
 import ResponseError from "../../utils/response-error";
 import sendEmail from "../../utils/mailer";
 import { redis } from "../../utils/redis";
@@ -88,7 +88,7 @@ export default class AuthService {
                         <div style="background:#0f172a;border-radius:8px;padding:16px;margin:28px 0;text-align:center">
                             <p style="margin:0;font-size:12px;color:#94a3b8">TOKEN VERIFIKASI</p>
                             <p style="margin:8px 0 0 0;font-size:18px;letter-spacing:1px;font-weight:600;color:#e5e7eb">
-                                ${token_hash.hashed_token}
+                                ${token_hash.token}
                             </p>
                         </div>
 

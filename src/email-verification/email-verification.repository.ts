@@ -6,45 +6,53 @@ export default class EmailVerificationRepository {
 
     static async get_token_data(token_hash: string) {
         const query = `
-            SELECT *
+            SELECT id, user_id, expires_at, used_at
             FROM authentication_tokens
             WHERE token_hash = $1
         `;
-        const value = [token_hash];
-        const result = await pg.query(query, value);
-        return result.rows[0];
+        const result = await pg.query(query, [token_hash]);
+        return result.rows[0] ?? null;
     }
 
-    static async get_data_user_by_user_id_on_email_verification_token(user_id: string | number) {
+    static async get_user_by_id(user_id: string | number) {
         const query = `
             SELECT id, status, email_verified_at
             FROM users
             WHERE id = $1
         `;
-        const value = [user_id];
-        const result = await pg.query(query, value);
-        return result.rows[0];
+        const result = await pg.query(query, [user_id]);
+        return result.rows[0] ?? null;
     }
 
-    static async update_user_email_verification_and_status(user_id: string | number) {
+    static async verify_user_email(user_id: string | number) {
         const query = `
             UPDATE users
             SET email_verified_at = NOW(), status = 'active'
             WHERE id = $1
+            RETURNING id, status, email_verified_at
         `;
-        const value = [user_id];
-        const result = await pg.query(query, value);
+        const result = await pg.query(query, [user_id]);
         return result.rows[0];
     }
 
-    static async update_token_as_used(token_hash: string) {
+    static async mark_token_as_used(token_id: string | number) {
         const query = `
             UPDATE authentication_tokens
             SET used_at = NOW()
-            WHERE token_hash = $1
+            WHERE id = $1
+            RETURNING id, used_at
         `;
-        const value = [token_hash];
-        const result = await pg.query(query, value);
+        const result = await pg.query(query, [token_id]);
+        return result.rows[0];
+    }
+
+    static async get_email(email: string) {
+        const query = `
+            SELECT id, email
+            FROM users
+            WHERE email = $1
+        `;
+        const result = await pg.query(query, [email]);
         return result.rows[0];
     }
 
