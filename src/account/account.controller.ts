@@ -77,7 +77,9 @@ export default class AccountController {
             return res.status(200).json({
                 status: 200,
                 code: "GET_MY_ACCOUNT_SUCCESS",
-                message: "get my account successful",
+                message: response.status === "pending"
+                    ? "please verify your email to unlock all features"
+                    : "get my account successful",
                 data: response
             });
         } catch (error) {

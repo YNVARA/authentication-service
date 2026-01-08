@@ -145,13 +145,6 @@ export default class AuthService {
 
         // validate status
         switch (response.status) {
-            case "pending":
-                throw new ResponseError({
-                    status: 403,
-                    code: "ACCOUNT_PENDING",
-                    message: "Your account is pending verification. Please verify your email."
-                });
-
             case "suspend":
                 throw new ResponseError({
                     status: 403,
@@ -175,22 +168,6 @@ export default class AuthService {
 
             case "active":
                 break;
-
-            default:
-                throw new ResponseError({
-                    status: 403,
-                    code: "ACCOUNT_INVALID_STATE",
-                    message: "Account is in an invalid state."
-                });
-        }
-
-        // validate email verification
-        if (!response.email_verified_at) {
-            throw new ResponseError({
-                status: 403,
-                code: "EMAIL_NOT_VERIFIED",
-                message: "Please verify your email before logging in."
-            });
         }
 
         // update last login

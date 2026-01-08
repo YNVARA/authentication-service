@@ -133,15 +133,6 @@ export async function refreshAccessToken(refreshToken: string) {
         const result = await pg.query(query_find_user_by_id, [decoded.sub]);
         const user = result.rows[0];
 
-        // make sure user is active
-        if (!user || user.status !== "active") {
-            throw new ResponseError({
-                status: 403,
-                code: "ACCOUNT_NOT_ACTIVE",
-                message: "Your account is not active.",
-            });
-        }
-
         // create payload
         const accessPayload = {
             sub: user.public_id,
