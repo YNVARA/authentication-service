@@ -56,6 +56,12 @@ JWT_AUDIENCE=myapp-users
 REDIS_HOST=
 REDIS_PORT=
 REDIS_PASS=
+
+# SMTP CONFIG
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_email@gmail.com
+SMTP_PASS=your_app_password
 ```
 
 3. Install dependencies and start the server:
@@ -119,6 +125,10 @@ docker run -d \
   -e REDIS_HOST=host.docker.internal \
   -e REDIS_PORT=6379 \
   -e REDIS_PASS=root \
+  -e SMTP_HOST=smtp.gmail.com \
+  -e SMTP_PORT=587 \
+  -e SMTP_USER=your_email \
+  -e SMTP_PASS=your_app_password \
   auth-service:latest
 ```
 
@@ -202,4 +212,20 @@ METHOD      : PATCH
 ENDPOINT    : /auth/update-username
 AUTHORIZE   : Bearer <access_token>
 BODY        : username
+```
+
+### EMAIL VERIFICATION
+
+```
+NAME        : VERIFY EMAIL
+METHOD      : GET
+ENDPOINT    : /auth/verify-email
+QUERY       : token
+```
+
+```
+NAME        : RESEND EMAIL VERIFICATION
+METHOD      : POST
+ENDPOINT    : /auth/resend-email-verification
+BODY        : email
 ```
