@@ -79,21 +79,21 @@ Run the service in a Docker container:
 
 ```bash
 docker build -t auth-service:latest .
-docker build -t auth-service:0.0.1 -t auth-service:latest .
+docker build -t auth-service:1.1.0 -t auth-service:latest .
 ```
 
 ```bash
 # login ke docker hub
 docker login
 
-# Tag untuk versi 0.0.1
-docker tag auth-service:0.0.1 <username-docker-hub>/auth-service:0.0.1
+# Tag untuk versi 1.1.0
+docker tag auth-service:1.1.0 <username-docker-hub>/auth-service:1.1.0
 
 # Tag untuk versi latest
 docker tag auth-service:latest <username-docker-hub>/auth-service:latest
 
 # Push versi spesifik
-docker push <username-docker-hub>/auth-service:0.0.1
+docker push <username-docker-hub>/auth-service:1.1.0
 
 # Push sebagai latest
 docker push <username-docker-hub>/auth-service:latest
