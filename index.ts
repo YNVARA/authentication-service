@@ -1,4 +1,5 @@
 // import dependencies
+import cors from "cors";
 import express from "express";
 import cookieParser from "cookie-parser";
 
@@ -25,19 +26,20 @@ async function bootstrap() {
 
     const app = express();
 
+    app.use(cors());
     app.use(cookieParser());
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
 
     // Authentication
-    app.post("/auth/register", limiter(10, 3), AuthController.register);
+    app.post("/auth/register", limiter(10, 30), AuthController.register);
     app.post("/auth/login", limiter(1, 5), AuthController.login);
     app.get("/auth/token", limiter(1, 20), AuthController.token);
     app.post("/auth/logout", limiter(1, 30), AuthMiddleware, AuthController.logout);
 
     // Email verification
-    app.get("/auth/verify-email", EmailVerificationController.emailVerification);
-    app.post("/auth/resend-email-verification", EmailVerificationController.resendEmailVerification);
+    app.post("/auth/verify-email", EmailVerificationController.emailVerification);
+    app.post("/auth/resend-email-verification", limiter(1, 1), EmailVerificationController.resendEmailVerification);
 
     // Credentials
     app.post("/auth/forgot-password", CredentialController.forgotPassword);

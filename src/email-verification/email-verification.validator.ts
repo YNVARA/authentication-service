@@ -8,7 +8,6 @@ export const ResendEmailVerificationSchema = z
 
 export const EmailVerificationSchema = z
     .object({
-        token: z
-            .string()
-            .min(10, { message: "invalid token" }),
+        email: z
+            .email({ message: "invalid email" }),
     });

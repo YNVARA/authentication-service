@@ -5,7 +5,7 @@ import type { Request, Response, NextFunction } from "express";
 import EmailVerificationService from "./email-verification.service";
 
 // import validators
-import { ResendEmailVerificationSchema } from "./email-verification.validator";
+import { EmailVerificationSchema, ResendEmailVerificationSchema } from "./email-verification.validator";
 
 // utils
 import ResponseSuccess from "../../utils/response-success";
@@ -15,7 +15,11 @@ export default class EmailVerificationController {
     static async emailVerification(req: Request, res: Response, next: NextFunction) {
         try {
             const { token } = req.query;
-            await EmailVerificationService.verify_email({ token: String(token) });
+            const { data } = await Validation(EmailVerificationSchema, req.body);
+            await EmailVerificationService.verify_email({
+                email: data.email,
+                token: String(token)
+            });
             return new ResponseSuccess({
                 status: 200,
                 code: "EMAIL_VERIFICATION_SUCCESS",

@@ -13,11 +13,31 @@ import { APP_CONFIG } from "../../config";
 // service for email verification
 export default class EmailVerificationService {
 
-    static async verify_email(data: { token: string }) {
+    static async verify_email(data: {
+        email: string,
+        token: string
+    }) {
+        const user_by_email = await EmailVerificationRepository.get_email(data.email);
         const hashed = hash_token(data.token);
-        const tokenRecord = await EmailVerificationRepository.get_token_data(hashed);
+        const tokenRecord = await EmailVerificationRepository.get_token_data(hashed, "email_verification");
+
+        if (!user_by_email) {
+            throw new ResponseError({
+                status: 404,
+                code: "USER_NOT_FOUND",
+                message: "User not found"
+            });
+        }
 
         if (!tokenRecord) {
+            throw new ResponseError({
+                status: 400,
+                code: "INVALID_TOKEN",
+                message: "Invalid or expired verification token"
+            });
+        }
+
+        if (user_by_email.id !== tokenRecord.user_id) {
             throw new ResponseError({
                 status: 400,
                 code: "INVALID_TOKEN",

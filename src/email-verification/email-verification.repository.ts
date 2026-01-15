@@ -4,13 +4,13 @@ import pg from "../../utils/pg";
 // repository for handle email verification
 export default class EmailVerificationRepository {
 
-    static async get_token_data(token_hash: string) {
+    static async get_token_data(token_hash: string, token_type: string) {
         const query = `
             SELECT id, user_id, expires_at, used_at
             FROM authentication_tokens
-            WHERE token_hash = $1
+            WHERE token_hash = $1 AND token_type = $2
         `;
-        const result = await pg.query(query, [token_hash]);
+        const result = await pg.query(query, [token_hash, token_type]);
         return result.rows[0] ?? null;
     }
 

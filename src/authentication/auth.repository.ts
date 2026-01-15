@@ -31,8 +31,8 @@ export default class AuthRepository {
         hash_password: string
     }) {
         const query = `
-            INSERT INTO users (public_id, email, username, hash_password, status, email_verified_at)
-            VALUES ($1, $2, $3, $4, $5, NOW())
+            INSERT INTO users (public_id, email, username, hash_password, status)
+            VALUES ($1, $2, $3, $4, $5)
             RETURNING id, public_id, email, username, created_at
         `;
         const values = [generatePublicId(), data.email, data.username, data.hash_password, "pending"];
