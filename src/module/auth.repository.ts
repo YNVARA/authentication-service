@@ -32,7 +32,6 @@ export default class AuthenticationRepository implements IAuthenticationReposito
             const user = insert_user.rows[0];
 
             await tx.query(q_insert_identifier, [user.id, data.identifier.kind, data.identifier.type, data.identifier.value, normalized_value, true, verified_at]);
-
             await tx.query(q_insert_password, [user.id, data.password_hash]);
             await tx.query(q_insert_profile, [user.id, data.first_name, data.last_name]);
 
