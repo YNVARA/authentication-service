@@ -23,6 +23,7 @@ export interface RegisterUserRequest {
     password_hash: string;
     first_name?: string;
     last_name?: string;
+    is_verified?: boolean;
 }
 
 export interface LoginRequest {
