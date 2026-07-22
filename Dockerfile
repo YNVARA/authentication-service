@@ -1,28 +1,48 @@
-# STAGE 1: Build
-FROM oven/bun:1 AS builder
+#############################################
+# Build Stage
+#############################################
+
+FROM oven/bun:1.2 AS builder
+
 WORKDIR /app
 
-# Copy dependensi
 COPY package.json bun.lock ./
+
 RUN bun install --frozen-lockfile
 
-# Copy seluruh source code (termasuk schema.sql)
 COPY . .
 
-# Jalankan script build (menghasilkan folder dist)
 RUN bun run build
 
-# STAGE 2: Runtime
-FROM oven/bun:1-slim AS release
+
+#############################################
+# Runtime Stage
+#############################################
+
+FROM debian:bookworm-slim
+
+RUN apt-get update && \
+    apt-get install -y \
+    ca-certificates \
+    libstdc++6 && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN useradd \
+    --system \
+    --create-home \
+    --shell /usr/sbin/nologin \
+    appuser
+
 WORKDIR /app
 
-# Copy hasil build dan node_modules
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package.json .
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/schema.sql ./schema.sql
+COPY --from=builder /app/dist/storage-service .
 
-# Expose port sesuai .env kamu
-EXPOSE 4000
+RUN chmod +x storage-service
 
-CMD ["bun", "run", "start"]
+USER appuser
+
+ENV NODE_ENV=production
+
+EXPOSE 3000
+
+ENTRYPOINT ["./storage-service"]

@@ -1,43 +1,49 @@
 {
-    "name": "auth-service",
-    "author": {
-        "name": "yudha ginong pratidina",
-        "email": "dev.yudhaginongpratidina@gmail.com"
-    },
+    "name": "authentication-service",
     "module": "index.ts",
     "type": "module",
     "private": true,
     "scripts": {
-        "dev": "bun --watch index.ts",
-        "build": "bun build index.ts --target=node --outdir ./dist && javascript-obfuscator dist --output dist && npx terser dist/index.js -c -m -o dist/index.min.js",
-        "start": "bun run ./dist/index.min.js"
+        "build": "rm -rf dist && mkdir -p dist && bun build ./src/server.ts --compile --minify --target=bun-linux-x64-modern --outfile ./dist/storage-service",
+        "dev": "bun --watch ./src/server.ts",
+        "start": "bun ./dist/server.js",
+        "format": "prettier --write .",
+        "format:check": "prettier --check ."
     },
     "devDependencies": {
+        "@types/bcrypt": "^6.0.0",
         "@types/bun": "latest",
         "@types/cookie-parser": "^1.4.10",
         "@types/cors": "^2.8.19",
         "@types/express": "^5.0.6",
         "@types/jsonwebtoken": "^9.0.10",
-        "@types/nodemailer": "^7.0.4",
-        "@types/pg": "^8.16.0"
+        "@types/nodemailer": "^8.0.1",
+        "@types/pg": "^8.20.0",
+        "prettier": "^3.9.5"
     },
     "peerDependencies": {
-        "typescript": "^5"
+        "typescript": "^5.9.3"
     },
     "dependencies": {
-        "@paralleldrive/cuid2": "^3.0.6",
-        "argon2": "^0.44.0",
+        "@scalar/express-api-reference": "^0.10.11",
+        "bcrypt": "^6.0.0",
+        "bson": "6",
         "cookie-parser": "^1.4.7",
-        "cors": "^2.8.5",
-        "dotenv": "^17.2.3",
+        "cors": "^2.8.6",
+        "dotenv": "^17.4.2",
         "express": "^5.2.1",
-        "express-rate-limit": "^8.2.1",
-        "ioredis": "^5.8.2",
-        "javascript-obfuscator": "^5.1.0",
+        "express-rate-limit": "^8.6.0",
+        "helmet": "^8.3.0",
+        "ioredis": "^5.11.1",
+        "javascript-obfuscator": "^5.5.0",
         "jsonwebtoken": "^9.0.3",
-        "node-vault": "^0.10.9",
-        "nodemailer": "^7.0.12",
-        "pg": "^8.16.3",
-        "zod": "^4.2.1"
+        "minio": "^8.0.7",
+        "mongodb": "6",
+        "mysql2": "^3.23.1",
+        "nodemailer": "^9.0.3",
+        "pg": "^8.22.0",
+        "pino": "^10.3.1",
+        "pino-pretty": "^13.1.3",
+        "zod": "^4.4.3"
     }
 }

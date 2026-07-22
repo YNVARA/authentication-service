@@ -1,231 +1,51 @@
-# AUTH SERVICE
-
-A lightweight authentication service built with Node.js, PostgreSQL, and Redis. Handles user registration, login, password management, and email verification.
-
----
-
-## Repository
-
 ```bash
-git clone https://github.com/Styxian-Legion/auth-service.git
-cd auth-service
-```
-
-## Requrements
-
-- PostgreSQL
-- Redis
-- Bun (for development)
-
-## Local Development
-
-1. Copy the example environment file:
-
-```bash
-cp .env.example .env
-```
-
-2. Edit .env to configure your local environment:
-
-```env
-# App Configuration
-APP_NAME=
-APP_VERSION=0.0.1
-APP_HOST=
-APP_PORT=
-APP_ENVIRONMENT=development
-APP_DOMAIN=
-
-# Database Configuration
-PG_DB_HOST=localhost
-PG_DB_PORT=
-PG_DB_USER=
-PG_DB_PASS=
-PG_DB_NAME=
-PG_MAX_CONNECTION=10
-PG_IDLE_TIMEOUT=10000
-PG_CONNECTION_TIMEOUT=5000
-
-# JWT Configuration
-JWT_ACCESS_TOKEN_SECRET=your_access_secret
-JWT_REFRESH_TOKEN_SECRET=your_refresh_secret
-JWT_ISSUER=auth.myapp.com
-JWT_AUDIENCE=myapp-users
-
-# Redis Configuration
-REDIS_HOST=
-REDIS_PORT=
-REDIS_PASS=
-
-# SMTP CONFIG
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your_email@gmail.com
-SMTP_PASS=your_app_password
-```
-
-3. Install dependencies and start the server:
-
-```bash
-bun install
-bun run dev
-```
-
-4. Open [http://localhost:4000](http://localhost:4000)
-
-## Running with Docker
-
-Run the service in a Docker container:
-
-```bash
-docker build -t auth-service:latest .
-docker build -t auth-service:1.1.0 -t auth-service:latest .
+docker build --no-cache --pull -t storage-service .
 ```
 
 ```bash
-# login ke docker hub
-docker login
-
-# Tag untuk versi 1.1.0
-docker tag auth-service:1.1.0 <username-docker-hub>/auth-service:1.1.0
-
-# Tag untuk versi latest
-docker tag auth-service:latest <username-docker-hub>/auth-service:latest
-
-# Push versi spesifik
-docker push <username-docker-hub>/auth-service:1.1.0
-
-# Push sebagai latest
-docker push <username-docker-hub>/auth-service:latest
+docker scout
 ```
 
 ```bash
 docker run -d \
-  --name auth-service-app \
-  -p 4000:4000 \
-  --add-host=host.docker.internal:host-gateway \
-  -e APP_NAME=auth-service \
-  -e APP_VERSION=0.0.1 \
-  -e APP_HOST=0.0.0.0 \
-  -e APP_PORT=4000 \
-  -e APP_ENVIRONMENT=development \
-  -e APP_DOMAIN=http://localhost:4000 \
-  -e PG_DB_HOST=host.docker.internal \
-  -e PG_DB_PORT=5432 \
-  -e PG_DB_USER=postgres \
-  -e PG_DB_PASS=postgres \
-  -e PG_DB_NAME=auth_service \
-  -e PG_MAX_CONNECTION=10 \
-  -e PG_IDLE_TIMEOUT=10000 \
-  -e PG_CONNECTION_TIMEOUT=5000 \
-  -e JWT_ACCESS_TOKEN_SECRET=super-secret \
-  -e JWT_REFRESH_TOKEN_SECRET=super-secret \
-  -e JWT_ISSUER=auth.myapp.com \
-  -e JWT_AUDIENCE=myapp-users \
-  -e REDIS_HOST=host.docker.internal \
-  -e REDIS_PORT=6379 \
-  -e REDIS_PASS=root \
-  -e SMTP_HOST=smtp.gmail.com \
-  -e SMTP_PORT=587 \
-  -e SMTP_USER=your_email \
-  -e SMTP_PASS=your_app_password \
-  auth-service:latest
-```
-
-## Notes
-
-- Make sure PostgreSQL and Redis are running locally or accessible from Docker.
-- Keep JWT secrets secure and never commit them to the repository.
-- This service is intended to be used behind an API Gateway in a microservices architecture.
-
-## Endpoints
-
-### Authentication
-
-```
-NAME        : REGISTER
-METHOD      : POST
-ENDPOINT    : /auth/register
-RATE LIMIT  : 3 request / 10 minutes
-BODY        : email, username, password, confirm_password
-```
-
-```
-NAME        : LOGIN
-METHOD      : POST
-ENDPOINT    : /auth/login
-RATE LIMIT  : 5 request / 1 minutes
-BODY        : email_or_username, password
-```
-
-```
-NAME        : GET NEW ACCESS TOKEN
-METHOD      : GET
-ENDPOINT    : /auth/token
-RATE LIMIT  : 20 request / 1 minutes
-```
-
-```
-NAME        : LOGOUT
-METHOD      : POST
-ENDPOINT    : /auth/logout
-RATE LIMIT  : 30 request / 1 minutes
-```
-
-### Credential
-
-```
-NAME        : CHANGE PASSWORD
-METHOD      : POST
-ENDPOINT    : /auth/change-password
-BODY        : old_password, new_password, confirm_password
-```
-
-### Account
-
-```
-NAME        : GET MY ACCOUNT
-METHOD      : GET
-ENDPOINT    : /auth/my-account
-AUTHORIZE   : Bearer <access_token>
-```
-
-```
-NAME        : DEACTIVE ACCOUNT
-METHOD      : POST
-ENDPOINT    : /auth/deactive-account
-AUTHORIZE   : Bearer <access_token>
-BODY        : password
-```
-
-```
-NAME        : DELETE ACCOUNT
-METHOD      : POST
-ENDPOINT    : /auth/delete-account
-AUTHORIZE   : Bearer <access_token>
-BODY        : password
-```
-
-```
-NAME        : UPDATE USERNAME
-METHOD      : PATCH
-ENDPOINT    : /auth/update-username
-AUTHORIZE   : Bearer <access_token>
-BODY        : username
-```
-
-### EMAIL VERIFICATION
-
-```
-NAME        : VERIFY EMAIL
-METHOD      : GET
-ENDPOINT    : /auth/verify-email
-QUERY       : token
-```
-
-```
-NAME        : RESEND EMAIL VERIFICATION
-METHOD      : POST
-ENDPOINT    : /auth/resend-email-verification
-BODY        : email
+    --name authentication-service \
+    -p 4000:3000 \
+    --read-only \
+    --cap-drop ALL \
+    --security-opt=no-new-privileges \
+    \
+    -e APP_NAME="STORAGE SERVICE" \
+    -e APP_VERSION="1.0.0" \
+    -e NODE_ENV="production" \
+    -e APP_HOST="0.0.0.0" \
+    -e APP_PORT="3000" \
+    -e APP_DOMAIN="localhost" \
+    \
+    -e CORS_ORIGINS="http://localhost:4000" \
+    \
+    -e LOG_LEVEL="info" \
+    \
+    -e DB_MAIN_ENGINE="postgres" \
+    -e DB_MAIN_HOST="host.docker.internal" \
+    -e DB_MAIN_PORT="5432" \
+    -e DB_MAIN_USERNAME="postgres" \
+    -e DB_MAIN_PASSWORD="postgres" \
+    -e DB_MAIN_DATABASE="storage_db" \
+    \
+    -e DB_SECOND_ENGINE="postgres" \
+    -e DB_SECOND_HOST="host.docker.internal" \
+    -e DB_SECOND_PORT="5432" \
+    -e DB_SECOND_USERNAME="postgres" \
+    -e DB_SECOND_PASSWORD="postgres" \
+    -e DB_SECOND_DATABASE="storage_db" \
+    \
+    -e MINIO_ENDPOINT="host.docker.internal" \
+    -e MINIO_PORT="9000" \
+    -e MINIO_USE_SSL="false" \
+    -e MINIO_ACCESS_KEY="minioadmin" \
+    -e MINIO_SECRET_KEY="minioadmin" \
+    -e MINIO_BUCKET="mybucket" \
+    -e MINIO_PUBLIC_URL="http://host.docker.internal:9000/mybucket" \
+    \
+    authentication-service
 ```
