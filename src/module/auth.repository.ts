@@ -2,7 +2,7 @@ import { HttpError } from '../core/errors/http.error';
 import type { DatabaseClient, TransactionClient } from '../config/database/types';
 import type { IAuthenticationRepository, RegisterUserRequest, UserIdentifier, User } from './auth.interface';
 
-export default class AuthenticationRepository implements IAuthenticationRepository {
+export class AuthenticationRepository implements IAuthenticationRepository {
     constructor(private readonly db: DatabaseClient) {}
 
     async create_user(data: RegisterUserRequest): Promise<User> {
@@ -26,7 +26,7 @@ export default class AuthenticationRepository implements IAuthenticationReposito
                 VALUES ($1, $2, $3)`;
 
             const normalized_value = data.identifier.value.toLowerCase().trim();
-            const verified_at = data.is_verified ? 'NOW()' : 'NULL';
+            const verified_at = data.is_verified ? 'NOW()' : null;
 
             const insert_user = await tx.query(q_insert_user);
             const user = insert_user.rows[0];
