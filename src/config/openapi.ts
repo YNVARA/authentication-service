@@ -3,6 +3,7 @@ import type { Express } from 'express';
 import { env } from './env';
 
 // docs
+import { authenticationOpenApi } from "../module/auth.openapi";
 
 export const setupOpenApi = (app: Express) => {
     const openApiSpecification = {
@@ -30,6 +31,7 @@ export const setupOpenApi = (app: Express) => {
                     },
                 },
             },
+            ...authenticationOpenApi.paths,
         },
         components: {
             securitySchemes: {
@@ -39,7 +41,9 @@ export const setupOpenApi = (app: Express) => {
                     bearerFormat: 'JWT',
                 },
             },
-            schemas: {},
+            schemas: {
+                ...authenticationOpenApi.components.schemas,
+            },
         },
     };
 
