@@ -19,7 +19,7 @@
         "@types/jsonwebtoken": "^9.0.10",
         "@types/nodemailer": "^8.0.1",
         "@types/pg": "^8.20.0",
-        "prettier": "^3.9.5"
+        "prettier": "^3.9.6"
     },
     "peerDependencies": {
         "typescript": "^5.9.3"
@@ -27,7 +27,7 @@
     "dependencies": {
         "@scalar/express-api-reference": "^0.10.11",
         "bcryptjs": "^2.4.3",
-        "bson": "6",
+        "bson": "^6.10.4",
         "cookie-parser": "^1.4.7",
         "cors": "^2.8.6",
         "dotenv": "^17.4.2",
@@ -38,7 +38,7 @@
         "javascript-obfuscator": "^5.5.0",
         "jsonwebtoken": "^9.0.3",
         "minio": "^8.0.7",
-        "mongodb": "6",
+        "mongodb": "^6.21.0",
         "mysql2": "^3.23.1",
         "nodemailer": "^9.0.3",
         "pg": "^8.22.0",
