@@ -58,7 +58,7 @@ export interface IAuthenticationController {
     me(req: Request, res: Response): Promise<any>;
     logout(req: Request, res: Response, next: NextFunction): Promise<any>;
 
-    email_verification(req: Request, res: Response): Promise<any>;
-    email_verification_resend(req: Request, res: Response): Promise<any>;
-    email_verification_status(req: Request, res: Response): Promise<any>;
+    email_verification(req: Request, res: Response, next: NextFunction): Promise<any>;
+    email_verification_resend(req: Request, res: Response, next: NextFunction): Promise<any>;
+    email_verification_status(req: Request, res: Response, next: NextFunction): Promise<any>;
 }

@@ -102,7 +102,7 @@ export class AuthenticationController implements IAuthenticationController {
         });
     };
 
-    email_verification = async (req: Request, res: Response): Promise<any> => {
+    email_verification = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
         const response = await this.service.email_verification({
             email: req.body.email,
             otp: req.body.otp,
@@ -113,7 +113,7 @@ export class AuthenticationController implements IAuthenticationController {
         });
     };
 
-    email_verification_resend = async (req: Request, res: Response): Promise<any> => {
+    email_verification_resend = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
         const response = await this.service.email_verification_resend(req.body.email);
         return res.status(200).json({
             success: true,
@@ -122,7 +122,7 @@ export class AuthenticationController implements IAuthenticationController {
         });
     };
 
-    email_verification_status = async (req: Request, res: Response): Promise<any> => {
+    email_verification_status = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
         const response = await this.service.email_verification_status(req.body.email);
         return res.status(200).json({
             success: true,
