@@ -52,6 +52,16 @@ export const authenticationOpenApi = {
                 },
             },
         },
+        '/auth/logout': {
+            post: {
+                tags: ['Authentication'],
+                summary: 'Logout',
+                security: [{ bearerAuth: [] }],
+                responses: {
+                    '200': { description: 'Logged out successfully' },
+                },
+            },
+        },
     },
     components: {
         schemas: {
