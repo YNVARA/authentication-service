@@ -3,7 +3,7 @@ export const authenticationOpenApi = {
         '/auth/register': {
             post: {
                 tags: ['Authentication'],
-                summary: 'Register a new user',
+                summary: 'Register',
                 requestBody: {
                     required: true,
                     content: {
@@ -22,6 +22,33 @@ export const authenticationOpenApi = {
                         },
                     },
                     '409': { description: 'User already exists' },
+                },
+            },
+        },
+        '/auth/login': {
+            post: {
+                tags: ['Authentication'],
+                summary: 'Login',
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: { $ref: '#/components/schemas/LocalLoginRequest' },
+                        },
+                    },
+                },
+                responses: {
+                    '200': {
+                        description: 'Login successful or MFA required',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    oneOf: [{ $ref: '#/components/schemas/LoginResponse' }, { $ref: '#/components/schemas/MfaRequiredResponse' }],
+                                },
+                            },
+                        },
+                    },
+                    '401': { description: 'Invalid credentials' },
                 },
             },
         },
@@ -46,6 +73,28 @@ export const authenticationOpenApi = {
                     password: { type: 'string', minLength: 8 },
                     confirm_password: { type: 'string' },
                     is_verified: { type: 'boolean', default: false },
+                },
+            },
+            LocalLoginRequest: {
+                type: 'object',
+                required: ['value', 'password'],
+                properties: {
+                    kind: { type: 'string', enum: ['EMAIL', 'PHONE', 'USERNAME', 'CUSTOM'], default: 'EMAIL' },
+                    type: { type: 'string', default: 'PRIMARY' },
+                    value: { type: 'string' },
+                    password: { type: 'string' },
+                },
+            },
+            LoginResponse: {
+                type: 'object',
+                properties: {
+                    success: { type: 'boolean' },
+                    data: {
+                        type: 'object',
+                        properties: {
+                            access_token: { type: 'string' },
+                        },
+                    },
                 },
             },
         },

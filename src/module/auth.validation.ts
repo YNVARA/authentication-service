@@ -34,3 +34,12 @@ export const registerSchema = z.object({
             path: ['confirm_password'],
         }),
 });
+
+export const loginSchema = z.object({
+    body: z.object({
+        kind: z.enum(['EMAIL', 'PHONE', 'USERNAME', 'CUSTOM']).default('EMAIL'),
+        type: z.string().trim().default('PRIMARY'),
+        value: z.string().trim().min(1),
+        password: z.string().min(8, { message: 'Password must be at least 8 characters' }),
+    }),
+});

@@ -10,10 +10,6 @@ import { getLogger } from '../core/logger/request-logger';
 import type { IAuthenticationRepository } from './auth.interface';
 import type { IAuthenticationService } from './auth.interface';
 
-// DTO
-import type { User } from './auth.interface';
-import type { RegisterUserRequest, LoginRequest } from './auth.interface';
-
 // libs
 import { send_email } from '../shared/libs/mailer';
 import { generate_otp, hashing_otp } from '../shared/libs/otp';
@@ -28,7 +24,17 @@ export class AuthenticationService implements IAuthenticationService {
         private container: any,
     ) {}
 
-    async register(data: RegisterUserRequest): Promise<User> {
+    async register(data: {
+        identifier: {
+            kind: 'EMAIL' | 'PHONE' | 'USERNAME' | 'CUSTOM';
+            value: string;
+            type: string;
+        };
+        password_hash: string;
+        first_name?: string;
+        last_name?: string;
+        is_verified?: boolean;
+    }): Promise<any> {
         const data_exists = await this.repo.exists_identifier(data.identifier);
         if (data_exists) {
             throw new HttpError(400, 'User already exists', 'USER_ALREADY_EXISTS', true);
@@ -56,7 +62,14 @@ export class AuthenticationService implements IAuthenticationService {
         return user;
     }
 
-    async login(data: LoginRequest): Promise<{ user: User; access_token: string; refresh_token: string }> {
+    async login(data: {
+        identifier: {
+            kind: 'EMAIL' | 'PHONE' | 'USERNAME' | 'CUSTOM';
+            value: string;
+            type: string;
+        };
+        password_hash: string;
+    }): Promise<any> {
         const user = await this.repo.find_by_identifier(data.identifier);
         if (!user) {
             throw new HttpError(400, 'User not found', 'USER_NOT_FOUND', true);

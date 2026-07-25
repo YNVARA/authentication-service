@@ -1,6 +1,6 @@
 import { HttpError } from '../core/errors/http.error';
 import type { DatabaseClient, TransactionClient } from '../config/database/types';
-import type { IAuthenticationRepository, RegisterUserRequest, UserIdentifier, User } from './auth.interface';
+import type { IAuthenticationRepository } from './auth.interface';
 
 export class AuthenticationRepository implements IAuthenticationRepository {
     constructor(private readonly db: DatabaseClient) {}
@@ -77,7 +77,7 @@ export class AuthenticationRepository implements IAuthenticationRepository {
         return res.rows[0];
     }
 
-    async find_by_id(id: string): Promise<User | null> {
+    async find_by_id(id: string): Promise<any> {
         const query = `
             SELECT
                 u.id,
@@ -95,12 +95,12 @@ export class AuthenticationRepository implements IAuthenticationRepository {
         return res.rows[0];
     }
 
-    async save_password(user_id: string, password_hash: string): Promise<void> {
+    async save_password(user_id: string, password_hash: string): Promise<any> {
         const q = `INSERT INTO auth.password_credentials (user_id, password_hash) VALUES ($1, $2)`;
         await this.db.query(q, [user_id, password_hash]);
     }
 
-    async get_password_hash(user_id: string): Promise<string | null> {
+    async get_password_hash(user_id: string): Promise<any> {
         const q = `SELECT password_hash FROM auth.password_credentials WHERE user_id = $1`;
         const res = await this.db.query(q, [user_id]);
         return res.rows[0]?.password_hash;
