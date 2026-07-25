@@ -14,6 +14,7 @@ export interface User {
     first_name?: string;
     last_name?: string;
     is_verified: boolean;
+    password_hash: string;
     created_at: Date;
     updated_at: Date;
 }
@@ -32,9 +33,19 @@ export interface LoginRequest {
 }
 
 export interface IAuthenticationRepository {
-    create_user(data: RegisterUserRequest): Promise<User>;
-    exists_identifier(identifier: UserIdentifier): Promise<boolean>;
-    find_by_identifier(identifier: UserIdentifier): Promise<User | null>;
+    create_user(data: {
+        identifier: {
+            kind: 'EMAIL' | 'PHONE' | 'USERNAME' | 'CUSTOM';
+            value: string;
+            type: string;
+        };
+        password_hash: string;
+        first_name?: string;
+        last_name?: string;
+        is_verified?: boolean;
+    }): Promise<any>;
+    exists_identifier(data: { kind: 'EMAIL' | 'PHONE' | 'USERNAME' | 'CUSTOM'; value: string; type: string }): Promise<boolean>;
+    find_by_identifier(data: { kind: 'EMAIL' | 'PHONE' | 'USERNAME' | 'CUSTOM'; value: string; type: string }): Promise<any>;
     find_by_id(id: string): Promise<User | null>;
     save_password(user_id: string, password_hash: string): Promise<void>;
     get_password_hash(user_id: string): Promise<string | null>;
@@ -42,11 +53,11 @@ export interface IAuthenticationRepository {
 
 export interface IAuthenticationService {
     register(data: RegisterUserRequest): Promise<User>;
-    // login(data: LoginRequest): Promise<{
-    //     user: User;
-    //     access_token: string;
-    //     refresh_token: string;
-    // }>;
+    login(data: LoginRequest): Promise<{
+        user: User;
+        access_token: string;
+        refresh_token: string;
+    }>;
     // refresh_token(refresh_token: string): Promise<{ access_token: string }>;
     // logout(user_id: string): Promise<void>;
     // verify_identifier(identifier: UserIdentifier): Promise<boolean>;

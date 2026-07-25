@@ -12,7 +12,7 @@ import type { IAuthenticationService } from './auth.interface';
 
 // DTO
 import type { User } from './auth.interface';
-import type { RegisterUserRequest } from './auth.interface';
+import type { RegisterUserRequest, LoginRequest } from './auth.interface';
 
 // libs
 import { send_email } from '../shared/libs/mailer';
@@ -54,5 +54,20 @@ export class AuthenticationService implements IAuthenticationService {
         }
 
         return user;
+    }
+
+    async login(data: LoginRequest): Promise<{ user: User; access_token: string; refresh_token: string }> {
+        const user = await this.repo.find_by_identifier(data.identifier);
+        if (!user) {
+            throw new HttpError(400, 'User not found', 'USER_NOT_FOUND', true);
+        }
+
+        const password_match = await compare_password(data.password_hash, user.password_hash);
+        if (!password_match) {
+            throw new HttpError(400, 'Invalid password', 'INVALID_PASSWORD', true);
+        }
+
+        const { access_token, refresh_token } = await generate_tokens(user.id);
+        return { user, access_token, refresh_token };
     }
 }

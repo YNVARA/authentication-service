@@ -5,7 +5,17 @@ import type { IAuthenticationRepository, RegisterUserRequest, UserIdentifier, Us
 export class AuthenticationRepository implements IAuthenticationRepository {
     constructor(private readonly db: DatabaseClient) {}
 
-    async create_user(data: RegisterUserRequest): Promise<User> {
+    async create_user(data: {
+        identifier: {
+            kind: 'EMAIL' | 'PHONE' | 'USERNAME' | 'CUSTOM';
+            value: string;
+            type: string;
+        };
+        password_hash: string;
+        first_name?: string;
+        last_name?: string;
+        is_verified?: boolean;
+    }): Promise<any> {
         if (!this.db.transaction) {
             throw new HttpError(400, 'Database does not support transactions', 'TRANSACTION_NOT_SUPPORTED', true);
         }
@@ -39,16 +49,16 @@ export class AuthenticationRepository implements IAuthenticationRepository {
         });
     }
 
-    async exists_identifier(identifier: UserIdentifier): Promise<boolean> {
+    async exists_identifier(data: { kind: 'EMAIL' | 'PHONE' | 'USERNAME' | 'CUSTOM'; value: string; type: string }): Promise<boolean> {
         const q = `SELECT EXISTS (SELECT 1 FROM auth.user_identifiers WHERE kind = $1 AND type = $2 AND value = $3)`;
-        const result = await this.db.query(q, [identifier.kind, identifier.type, identifier.value]);
+        const result = await this.db.query(q, [data.kind, data.type, data.value]);
         return result.rows[0].exists;
     }
 
-    async find_by_identifier(identifier: UserIdentifier): Promise<User | null> {
-        const normalized_value = identifier.value.toLowerCase().trim();
-        const type_condition = identifier.type ? 'AND ui.type = $3' : '';
-        const params = identifier.type ? [identifier.kind, normalized_value, identifier.type] : [identifier.kind, normalized_value];
+    async find_by_identifier(data: { kind: 'EMAIL' | 'PHONE' | 'USERNAME' | 'CUSTOM'; value: string; type: string }): Promise<any> {
+        const normalized_value = data.value.toLowerCase().trim();
+        const type_condition = data.type ? 'AND ui.type = $3' : '';
+        const params = data.type ? [data.kind, normalized_value, data.type] : [data.kind, normalized_value];
 
         const query = `
             SELECT
