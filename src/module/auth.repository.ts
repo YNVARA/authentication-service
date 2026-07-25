@@ -33,7 +33,7 @@ export class AuthenticationRepository implements IAuthenticationRepository {
 
             await tx.query(q_insert_identifier, [user.id, data.identifier.kind, data.identifier.type, data.identifier.value, normalized_value, true, verified_at]);
             await tx.query(q_insert_password, [user.id, data.password_hash]);
-            await tx.query(q_insert_profile, [user.id, data.first_name, data.last_name]);
+            await tx.query(q_insert_profile, [user.id, data.first_name?.toLowerCase().trim(), data.last_name?.toLowerCase().trim()]);
 
             return user;
         });

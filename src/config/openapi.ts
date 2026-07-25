@@ -3,7 +3,7 @@ import type { Express } from 'express';
 import { env } from './env';
 
 // docs
-import { authenticationOpenApi } from "../module/auth.openapi";
+import { authenticationOpenApi } from '../module/auth.openapi';
 
 export const setupOpenApi = (app: Express) => {
     const openApiSpecification = {

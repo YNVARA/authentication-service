@@ -1,6 +1,6 @@
 export const authenticationOpenApi = {
     paths: {
-        '/auth/register/local': {
+        '/auth/register': {
             post: {
                 tags: ['Authentication'],
                 summary: 'Register a new user',
