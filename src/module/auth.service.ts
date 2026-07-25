@@ -168,14 +168,113 @@ export class AuthenticationService implements IAuthenticationService {
 
             // Temporary MFA session using MFA TTL from env
             const mfaSessionId = crypto.randomUUID();
-            await redisClient.set(`mfa_session:${mfaSessionId}`, JSON.stringify({ userId: user.id, type: activeMfa.type, hash: mfaHash }), 'EX', env.ttl.mfa);
+            await redisClient.set(`mfa_session:${mfaSessionId}`, JSON.stringify({ user_id: user.id, type: activeMfa.type, hash: mfaHash }), 'EX', env.ttl.mfa);
 
             if (activeMfa.type === 'EMAIL') {
                 const profile = await this.repo.find_by_id(user.id);
                 await send_email({
                     to: profile.email,
-                    subject: 'Login MFA Code',
-                    html: `<p>Your login code is: <b>${mfaToken} - ${mfaSessionId}</b></p><p>This code will expire in ${env.ttl.mfa / 60} minutes.</p>`,
+                    subject: 'Your Login Verification Code',
+                    html: `
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8" />
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        </head>
+                        <body style="margin:0;padding:0;background:#f5f7fb;font-family:Arial,Helvetica,sans-serif;color:#1f2937;">
+                            <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f7fb;padding:40px 20px;">
+                                <tr>
+                                    <td align="center">
+                                        <table width="600" cellpadding="0" cellspacing="0"
+                                            style="max-width:600px;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e5e7eb;">
+                                            <!-- Header -->
+                                            <tr>
+                                                <td align="center" style="background:#2563eb;padding:32px 24px;color:#ffffff;">
+                                                    <h1 style="margin:0;font-size:24px;font-weight:bold;">
+                                                        🔐 Login Verification
+                                                    </h1>
+                                                    <p style="margin:10px 0 0;font-size:14px;opacity:.9;">
+                                                        Secure Multi-Factor Authentication
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                            <!-- Body -->
+                                            <tr>
+                                                <td style="padding:40px 32px;">
+                                                    <p style="margin:0 0 16px;font-size:16px;">
+                                                        Hello,
+                                                    </p>
+                                                    <p style="margin:0 0 24px;font-size:15px;line-height:1.7;color:#4b5563;">
+                                                        We received a request to sign in to your account.
+                                                        Please use the verification code below to complete your login.
+                                                    </p>
+                                                    <!-- OTP -->
+                                                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+                                                        <tr>
+                                                            <td align="center"
+                                                                style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:24px;">
+                                                                <div style="font-size:13px;color:#6b7280;margin-bottom:8px;">
+                                                                    Verification Code
+                                                                </div>
+                                                                <div style="font-size:36px;font-weight:bold;letter-spacing:6px;color:#2563eb;">
+                                                                    ${mfaToken}
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    <!-- Session -->
+                                                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+                                                        <tr>
+                                                            <td
+                                                                style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:16px;">
+                                                                <div style="font-size:12px;color:#6b7280;margin-bottom:6px;">
+                                                                    MFA Session ID
+                                                                </div>
+                                                                <div
+                                                                    style="font-size:14px;font-family:monospace;color:#111827;word-break:break-all;">
+                                                                    ${mfaSessionId}
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    <!-- Expiration -->
+                                                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+                                                        <tr>
+                                                            <td style="background:#fff7ed;border-left:4px solid #f97316;padding:16px;">
+                                                                <strong>Expires in:</strong>
+                                                                ${env.ttl.mfa / 60} minutes
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    <p style="margin:0;font-size:14px;line-height:1.7;color:#6b7280;">
+                                                        If you did <strong>not</strong> attempt to sign in, you can safely ignore this email.
+                                                        Never share your verification code with anyone.
+                                                    </p>
+
+                                                </td>
+                                            </tr>
+
+                                            <!-- Footer -->
+                                            <tr>
+                                                <td align="center" style="padding:24px;background:#f9fafb;border-top:1px solid #e5e7eb;">
+                                                    <p style="margin:0;font-size:13px;color:#9ca3af;">
+                                                        This is an automated security email. Please do not reply.
+                                                    </p>
+
+                                                    <p style="margin:8px 0 0;font-size:12px;color:#9ca3af;">
+                                                        © ${new Date().getFullYear()} Your Company. All rights reserved.
+                                                    </p>
+                                                </td>
+                                            </tr>
+
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </body>
+                        </html>
+                `,
                 });
             }
 
@@ -265,11 +364,105 @@ export class AuthenticationService implements IAuthenticationService {
         const normalizedEmail = email.toLowerCase().trim();
 
         await redisClient.set(`email_verification:${normalizedEmail}`, hash_otp, 'EX', env.ttl.verification);
-
         await send_email({
             to: email,
             subject: 'Verify Your Email',
-            html: `<p>Your new verification code is: <b>${otp}</b></p><p>This code will expire in ${env.ttl.verification / 3600} hours.</p>`,
+            html: `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Email Verification</title>
+            </head>
+            <body style="margin:0;padding:0;background:#f4f7fb;font-family:Arial,Helvetica,sans-serif;">
+                <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f7fb;padding:40px 20px;">
+                    <tr>
+                        <td align="center">
+                            <table width="600" cellpadding="0" cellspacing="0"
+                                style="max-width:600px;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.08);">
+                                <!-- Header -->
+                                <tr>
+                                    <td style="background:linear-gradient(135deg,#2563eb,#4f46e5);padding:40px;text-align:center;">
+                                        <h1 style="margin:0;color:#ffffff;font-size:28px;">
+                                            Email Verification
+                                        </h1>
+                                        <p style="margin-top:10px;color:#dbeafe;font-size:15px;">
+                                            Confirm your email address
+                                        </p>
+                                    </td>
+                                </tr>
+                                <!-- Body -->
+                                <tr>
+                                    <td style="padding:40px;color:#374151;">
+                                        <p style="font-size:16px;line-height:1.7;margin-top:0;">
+                                            Hello,
+                                        </p>
+                                        <p style="font-size:16px;line-height:1.7;">
+                                            Thank you for registering. To complete your verification,
+                                            please use the following One-Time Password (OTP):
+                                        </p>
+                                        <div style="margin:35px 0;text-align:center;">
+                                            <div style="
+                                                display:inline-block;
+                                                background:#eff6ff;
+                                                border:2px dashed #2563eb;
+                                                border-radius:10px;
+                                                padding:18px 36px;
+                                                font-size:36px;
+                                                letter-spacing:10px;
+                                                font-weight:bold;
+                                                color:#2563eb;
+                                            ">
+                                                ${otp}
+                                            </div>
+                                        </div>
+                                        <p style="font-size:15px;color:#6b7280;line-height:1.7;">
+                                            This verification code will expire in
+                                            <strong>${env.ttl.verification / 3600} hours</strong>.
+                                        </p>
+                                        <table width="100%" cellpadding="0" cellspacing="0" style="
+                                            margin-top:30px;
+                                            background:#fff7ed;
+                                            border-left:4px solid #f59e0b;
+                                            border-radius:6px;
+                                        ">
+                                            <tr>
+                                                <td style="padding:18px;">
+                                                    <strong>Security Notice</strong>
+                                                    <p style="margin:8px 0 0;color:#6b7280;line-height:1.6;">
+                                                        Never share this code with anyone. Our team will
+                                                        never ask you for your verification code.
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <!-- Footer -->
+                                <tr>
+                                    <td style="
+                                        padding:30px;
+                                        background:#f9fafb;
+                                        text-align:center;
+                                        color:#9ca3af;
+                                        font-size:13px;
+                                        line-height:1.7;
+                                    ">
+                                        <strong>Your Application</strong><br>
+                                        This is an automated email. Please do not reply.<br><br>
+
+                                        © ${new Date().getFullYear()} Your Application.
+                                        All rights reserved.
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </body>
+            </html>
+        `,
         });
 
         return { message: 'Verification code resent' };
@@ -311,7 +504,7 @@ export class AuthenticationService implements IAuthenticationService {
         await redisClient.set(`session:${session_id}`, JSON.stringify(session_data), 'EX', env.ttl.session);
         await redisClient.sadd(`user_sessions:${user_id}`, session_id);
 
-        return { access_token, refresh_token };
+        return { access_token };
     }
 
     async mfa_setup_email(user_id: string): Promise<void> {
