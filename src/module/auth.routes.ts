@@ -5,8 +5,9 @@ import { Router } from 'express';
 import { asyncHandler } from '../core/http/async-handler';
 import { validate } from '../shared/middleware/validate.middleware';
 
-// validation
+// validation and middleware
 import { registerSchema, loginSchema } from './auth.validation';
+import authMiddleware from '../shared/middleware/auth.middleware';
 
 // interface
 import type { IAuthenticationController } from './auth.interface';
@@ -19,6 +20,7 @@ export class AuthenticationRoutes {
 
         router.post('/register', validate(registerSchema), asyncHandler(this.controller.register));
         router.post('/login', validate(loginSchema), asyncHandler(this.controller.login));
+        router.post('/logout', authMiddleware, asyncHandler(this.controller.logout));
 
         return router;
     }

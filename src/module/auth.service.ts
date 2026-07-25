@@ -96,4 +96,18 @@ export class AuthenticationService implements IAuthenticationService {
 
         return { user, access_token, refresh_token };
     }
+
+    async logout(data: { sid: string; user_id?: string }): Promise<void> {
+        const sessionData = await redisClient.get(`session:${data.sid}`);
+        let user_id = data.user_id;
+
+        if (sessionData && !user_id) {
+            user_id = JSON.parse(sessionData).user_id;
+        }
+
+        await redisClient.del(`session:${data.sid}`);
+        if (user_id) {
+            await redisClient.srem(`user_sessions:${user_id}`, data.sid);
+        }
+    }
 }

@@ -42,8 +42,8 @@ export interface IAuthenticationService {
         },
         metadata?: { ip?: string; user_agent?: string },
     ): Promise<any>;
+    logout(data: { sid: string; user_id?: string }): Promise<any>;
     // refresh_token(refresh_token: string): Promise<{ access_token: string }>;
-    // logout(user_id: string): Promise<void>;
     // verify_identifier(identifier: UserIdentifier): Promise<boolean>;
     // get_user(id: string): Promise<User | null>;
 }
@@ -51,7 +51,7 @@ export interface IAuthenticationService {
 export interface IAuthenticationController {
     register(req: Request, res: Response, next: NextFunction): Promise<void>;
     login(req: Request, res: Response, next: NextFunction): Promise<void>;
+    logout(req: Request, res: Response, next: NextFunction): Promise<void>;
     // refresh_token(req: Request, res: Response, next: NextFunction): Promise<void>;
-    // logout(req: Request, res: Response, next: NextFunction): Promise<void>;
     // me(req: Request, res: Response, next: NextFunction): Promise<void>;
 }

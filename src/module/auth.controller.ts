@@ -50,11 +50,32 @@ export class AuthenticationController implements IAuthenticationController {
             metadata,
         );
 
+        res.cookie('refresh_token', response.refresh_token, cookie_options);
+        res.cookie('authenticated', true, cookie_options);
+
         return res.status(200).json({
             success: true,
             data: {
                 access_token: response.access_token,
             },
+        });
+    };
+
+    logout = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        const user = (req as any).user;
+        if (user?.session_id) {
+            await this.service.logout({
+                sid: user.session_id,
+                user_id: user.id,
+            });
+        }
+
+        res.clearCookie('refresh_token', cookie_options);
+        res.clearCookie('authenticated', cookie_options);
+
+        res.status(200).json({
+            success: true,
+            message: 'Logout successfully',
         });
     };
 }
