@@ -33,14 +33,22 @@ export class AuthenticationController implements IAuthenticationController {
 
     login = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
         const { kind, type, value, password } = req.body;
-        const response = await this.service.login({
-            identifier: {
-                kind,
-                type: type || 'PRIMARY',
-                value,
+        const metadata = {
+            ip: (req.headers['x-forwarded-for'] as string) || req.ip || '',
+            user_agent: (req.headers['user-agent'] as string) || '',
+        };
+
+        const response = await this.service.login(
+            {
+                identifier: {
+                    kind,
+                    type: type || 'PRIMARY',
+                    value,
+                },
+                password_hash: password,
             },
-            password_hash: password,
-        });
+            metadata,
+        );
 
         return res.status(200).json({
             success: true,

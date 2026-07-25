@@ -31,14 +31,17 @@ export interface IAuthenticationService {
         last_name?: string;
         is_verified?: boolean;
     }): Promise<any>;
-    login(data: {
-        identifier: {
-            kind: 'EMAIL' | 'PHONE' | 'USERNAME' | 'CUSTOM';
-            value: string;
-            type: string;
-        };
-        password_hash: string;
-    }): Promise<any>;
+    login(
+        data: {
+            identifier: {
+                kind: 'EMAIL' | 'PHONE' | 'USERNAME' | 'CUSTOM';
+                value: string;
+                type: string;
+            };
+            password_hash: string;
+        },
+        metadata?: { ip?: string; user_agent?: string },
+    ): Promise<any>;
     // refresh_token(refresh_token: string): Promise<{ access_token: string }>;
     // logout(user_id: string): Promise<void>;
     // verify_identifier(identifier: UserIdentifier): Promise<boolean>;

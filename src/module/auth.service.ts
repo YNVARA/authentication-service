@@ -62,14 +62,17 @@ export class AuthenticationService implements IAuthenticationService {
         return user;
     }
 
-    async login(data: {
-        identifier: {
-            kind: 'EMAIL' | 'PHONE' | 'USERNAME' | 'CUSTOM';
-            value: string;
-            type: string;
-        };
-        password_hash: string;
-    }): Promise<any> {
+    async login(
+        data: {
+            identifier: {
+                kind: 'EMAIL' | 'PHONE' | 'USERNAME' | 'CUSTOM';
+                value: string;
+                type: string;
+            };
+            password_hash: string;
+        },
+        metadata?: { ip?: string; user_agent?: string },
+    ): Promise<any> {
         const user = await this.repo.find_by_identifier(data.identifier);
         if (!user) {
             throw new HttpError(400, 'User not found', 'USER_NOT_FOUND', true);
@@ -80,7 +83,17 @@ export class AuthenticationService implements IAuthenticationService {
             throw new HttpError(400, 'Invalid password', 'INVALID_PASSWORD', true);
         }
 
-        const { access_token, refresh_token } = await generate_tokens(user.id);
+        const { access_token, refresh_token, session_id } = await generate_tokens(user.id);
+        const session_data = {
+            user_id: user.id,
+            ip: metadata?.ip,
+            user_agent: metadata?.user_agent,
+            created_at: new Date().toISOString(),
+        };
+
+        await redisClient.set(`session:${session_id}`, JSON.stringify(session_data), 'EX', env.ttl.session);
+        await redisClient.sadd(`user_sessions:${user.id}`, session_id);
+
         return { user, access_token, refresh_token };
     }
 }
