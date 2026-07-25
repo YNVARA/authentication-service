@@ -15,6 +15,8 @@ export interface IAuthenticationRepository {
     exists_identifier(data: { kind: 'EMAIL' | 'PHONE' | 'USERNAME' | 'CUSTOM'; value: string; type: string }): Promise<boolean>;
     find_by_identifier(data: { kind: 'EMAIL' | 'PHONE' | 'USERNAME' | 'CUSTOM'; value: string; type: string }): Promise<any>;
     find_by_id(id: string): Promise<any>;
+
+    verify_identifier(data: { user_id: string; kind: string; value: string }): Promise<any>;
 }
 
 export interface IAuthenticationService {
@@ -43,6 +45,8 @@ export interface IAuthenticationService {
     generate_token(data: { refresh_token: string }): Promise<any>;
     me(user_id: string): Promise<any>;
     logout(data: { sid: string; user_id?: string }): Promise<any>;
+
+    email_verification(data: { email: string; otp: string }): Promise<any>;
 }
 
 export interface IAuthenticationController {
@@ -51,4 +55,6 @@ export interface IAuthenticationController {
     generate_token(req: Request, res: Response, next: NextFunction): Promise<any>;
     me(req: Request, res: Response): Promise<any>;
     logout(req: Request, res: Response, next: NextFunction): Promise<any>;
+
+    email_verification(req: Request, res: Response): Promise<any>;
 }

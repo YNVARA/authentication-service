@@ -101,4 +101,15 @@ export class AuthenticationController implements IAuthenticationController {
             message: 'Logout successfully',
         });
     };
+
+    email_verification = async (req: Request, res: Response): Promise<any> => {
+        const response = await this.service.email_verification({
+            email: req.body.email,
+            otp: req.body.otp,
+        });
+        return res.status(200).json({
+            success: true,
+            data: response,
+        });
+    };
 }

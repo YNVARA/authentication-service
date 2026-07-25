@@ -43,3 +43,10 @@ export const loginSchema = z.object({
         password: z.string().min(8, { message: 'Password must be at least 8 characters' }),
     }),
 });
+
+export const emailVerifySchema = z.object({
+    body: z.object({
+        email: z.string().trim().toLowerCase().email({ message: 'Invalid email address' }),
+        otp: z.string().trim().min(1, { message: 'OTP is required' }),
+    }),
+});

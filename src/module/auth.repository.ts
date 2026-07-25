@@ -104,4 +104,14 @@ export class AuthenticationRepository implements IAuthenticationRepository {
         const res = await this.db.query(query, [id]);
         return res.rows[0] ?? null;
     }
+
+    async verify_identifier(data: { user_id: string; kind: string; value: string }): Promise<void> {
+        const normalized_value = data.value.toLowerCase().trim();
+        const query = `
+            UPDATE auth.user_identifiers
+            SET verified_at = NOW(), updated_at = NOW()
+            WHERE user_id = $1 AND kind = $2 AND normalized_value = $3
+        `;
+        await this.db.query(query, [data.user_id, data.kind, normalized_value]);
+    }
 }

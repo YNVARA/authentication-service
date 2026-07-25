@@ -106,6 +106,24 @@ export const authenticationOpenApi = {
                 },
             },
         },
+        '/auth/verify/email': {
+            post: {
+                tags: ['Email Verification'],
+                summary: 'Verify user email with OTP',
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: { $ref: '#/components/schemas/EmailVerifyRequest' },
+                        },
+                    },
+                },
+                responses: {
+                    '200': { description: 'Email verified successfully' },
+                    '400': { description: 'Invalid or expired token' },
+                },
+            },
+        },
     },
     components: {
         schemas: {
@@ -149,6 +167,14 @@ export const authenticationOpenApi = {
                             access_token: { type: 'string' },
                         },
                     },
+                },
+            },
+            EmailVerifyRequest: {
+                type: 'object',
+                required: ['email', 'otp'],
+                properties: {
+                    email: { type: 'string', format: 'email' },
+                    otp: { type: 'string' },
                 },
             },
         },

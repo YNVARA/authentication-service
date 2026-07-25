@@ -6,7 +6,7 @@ import { asyncHandler } from '../core/http/async-handler';
 import { validate } from '../shared/middleware/validate.middleware';
 
 // validation and middleware
-import { registerSchema, loginSchema } from './auth.validation';
+import { registerSchema, loginSchema, emailVerifySchema } from './auth.validation';
 import authMiddleware from '../shared/middleware/auth.middleware';
 
 // interface
@@ -23,6 +23,8 @@ export class AuthenticationRoutes {
         router.get('/token', asyncHandler(this.controller.generate_token));
         router.get('/me', authMiddleware, asyncHandler(this.controller.me));
         router.post('/logout', authMiddleware, asyncHandler(this.controller.logout));
+
+        router.post('/verify/email', validate(emailVerifySchema), asyncHandler(this.controller.email_verification));
 
         return router;
     }

@@ -12,7 +12,7 @@ import type { IAuthenticationService } from './auth.interface';
 
 // libs
 import { send_email } from '../shared/libs/mailer';
-import { generate_otp, hashing_otp } from '../shared/libs/otp';
+import { compare_otp, generate_otp, hashing_otp } from '../shared/libs/otp';
 import { generate_tokens, refresh_access_token } from '../shared/libs/jwt';
 import { hashing_password, compare_password } from '../shared/libs/password';
 
@@ -120,5 +120,34 @@ export class AuthenticationService implements IAuthenticationService {
         if (user_id) {
             await redisClient.srem(`user_sessions:${user_id}`, data.sid);
         }
+    }
+
+    async email_verification(data: { email: string; otp: string }): Promise<any> {
+        const { email, otp } = data;
+        const normalizedEmail = email.toLowerCase().trim();
+
+        this.logger.info({ email: normalizedEmail }, 'EMAIL_VERIFICATION_ATTEMPT');
+
+        const storedHash = await redisClient.get(`email_verification:${normalizedEmail}`);
+        if (!storedHash) {
+            this.logger.warn({ email: normalizedEmail }, 'VERIFICATION_HASH_NOT_FOUND_OR_EXPIRED');
+            throw new HttpError(400, 'Verification code expired or invalid', 'VERIFICATION_EXPIRED', true);
+        }
+
+        const isValid = compare_otp(otp, storedHash);
+        if (!isValid) {
+            this.logger.warn({ email: normalizedEmail }, 'INVALID_VERIFICATION_CODE_MATCH_FAILED');
+            throw new HttpError(400, 'Invalid verification code', 'INVALID_CODE', true);
+        }
+
+        const user = await this.repo.find_by_identifier({ kind: 'EMAIL', value: email, type: 'PRIMARY' });
+        if (!user) {
+            throw new HttpError(404, 'User not found', 'USER_NOT_FOUND', true);
+        }
+
+        await this.repo.verify_identifier({ user_id: user.id, kind: 'EMAIL', value: email });
+        await redisClient.del(`email_verification:${normalizedEmail}`);
+
+        return { message: 'Email verified successfully' };
     }
 }
