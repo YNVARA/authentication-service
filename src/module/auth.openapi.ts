@@ -82,7 +82,7 @@ export const authenticationOpenApi = {
         '/auth/me': {
             get: {
                 tags: ['Authentication'],
-                summary: 'Get current logged in',
+                summary: 'Get user profile',
                 security: [{ bearerAuth: [] }],
                 responses: {
                     '200': {
@@ -121,6 +121,52 @@ export const authenticationOpenApi = {
                 responses: {
                     '200': { description: 'Email verified successfully' },
                     '400': { description: 'Invalid or expired token' },
+                },
+            },
+        },
+        '/auth/verify/email/status': {
+            post: {
+                tags: ['Email Verification'],
+                summary: 'Check email verification status',
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    email: { type: 'string', format: 'email' },
+                                },
+                                required: ['email'],
+                            },
+                        },
+                    },
+                },
+                responses: {
+                    '200': { description: 'Status retrieved' },
+                },
+            },
+        },
+        '/auth/verify/email/resend': {
+            post: {
+                tags: ['Email Verification'],
+                summary: 'Resend verification email',
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    email: { type: 'string', format: 'email' },
+                                },
+                                required: ['email'],
+                            },
+                        },
+                    },
+                },
+                responses: {
+                    '200': { description: 'Verification email sent' },
                 },
             },
         },

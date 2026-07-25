@@ -25,6 +25,8 @@ export class AuthenticationRoutes {
         router.post('/logout', authMiddleware, asyncHandler(this.controller.logout));
 
         router.post('/verify/email', validate(emailVerifySchema), asyncHandler(this.controller.email_verification));
+        router.post('/verify/email/status', asyncHandler(this.controller.email_verification_status));
+        router.post('/verify/email/resend', asyncHandler(this.controller.email_verification_resend));
 
         return router;
     }

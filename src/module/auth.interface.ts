@@ -47,6 +47,8 @@ export interface IAuthenticationService {
     logout(data: { sid: string; user_id?: string }): Promise<any>;
 
     email_verification(data: { email: string; otp: string }): Promise<any>;
+    email_verification_resend(email: string): Promise<any>;
+    email_verification_status(email: string): Promise<any>;
 }
 
 export interface IAuthenticationController {
@@ -57,4 +59,6 @@ export interface IAuthenticationController {
     logout(req: Request, res: Response, next: NextFunction): Promise<any>;
 
     email_verification(req: Request, res: Response): Promise<any>;
+    email_verification_resend(req: Request, res: Response): Promise<any>;
+    email_verification_status(req: Request, res: Response): Promise<any>;
 }

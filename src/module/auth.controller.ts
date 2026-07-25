@@ -112,4 +112,21 @@ export class AuthenticationController implements IAuthenticationController {
             data: response,
         });
     };
+
+    email_verification_resend = async (req: Request, res: Response): Promise<any> => {
+        const response = await this.service.email_verification_resend(req.body.email);
+        return res.status(200).json({
+            success: true,
+            message: 'Please check your email for verification code',
+            data: response,
+        });
+    };
+
+    email_verification_status = async (req: Request, res: Response): Promise<any> => {
+        const response = await this.service.email_verification_status(req.body.email);
+        return res.status(200).json({
+            success: true,
+            data: response,
+        });
+    };
 }

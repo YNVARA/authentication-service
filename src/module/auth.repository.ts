@@ -94,7 +94,8 @@ export class AuthenticationRepository implements IAuthenticationRepository {
                 ) AS full_name,
                 up.first_name,
                 up.last_name,
-                ui.normalized_value AS email
+                ui.normalized_value AS email,
+                ui.verified_at IS NOT NULL AS email_verified
             FROM auth.users u
             LEFT JOIN auth.user_profiles up ON u.id = up.user_id
             LEFT JOIN auth.user_identifiers ui ON u.id = ui.user_id
