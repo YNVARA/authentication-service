@@ -53,6 +53,13 @@ export class AuthenticationController implements IAuthenticationController {
         res.cookie('refresh_token', response.refresh_token, cookie_options);
         res.cookie('authenticated', true, cookie_options);
 
+        if (response.mfa_required) {
+            return res.status(200).json({
+                success: true,
+                message: 'Check your email for verification code',
+            });
+        }
+
         res.status(200).json({
             success: true,
             data: {

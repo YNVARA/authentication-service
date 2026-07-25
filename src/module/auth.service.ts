@@ -173,9 +173,9 @@ export class AuthenticationService implements IAuthenticationService {
             if (activeMfa.type === 'EMAIL') {
                 const profile = await this.repo.find_by_id(user.id);
                 await send_email({
-                    to: profile.primary_identifier,
+                    to: profile.email,
                     subject: 'Login MFA Code',
-                    html: `<p>Your login code is: <b>${mfaToken}</b></p><p>This code will expire in ${env.ttl.mfa / 60} minutes.</p>`,
+                    html: `<p>Your login code is: <b>${mfaToken} - ${mfaSessionId}</b></p><p>This code will expire in ${env.ttl.mfa / 60} minutes.</p>`,
                 });
             }
 
@@ -286,10 +286,6 @@ export class AuthenticationService implements IAuthenticationService {
         };
     }
 
-    // async mfa_verify(data: { user_id: string; token: string; type: string }): Promise<any> {
-    //     return { message: 'Not implemented via specific session yet' };
-    // }
-
     async mfa_verify_session(data: { mfa_session: string; token: string }, metadata?: { ip?: string; user_agent?: string }): Promise<any> {
         const { mfa_session, token } = data;
         const sessionData = await redisClient.get(`mfa_session:${mfa_session}`);
@@ -304,17 +300,18 @@ export class AuthenticationService implements IAuthenticationService {
 
         await redisClient.del(`mfa_session:${mfa_session}`);
 
-        const tokens = generate_tokens(user_id);
-        const newSessionData = {
-            user_id,
+        const { access_token, refresh_token, session_id } = generate_tokens(user_id);
+        const session_data = {
+            user_id: user_id,
             ip: metadata?.ip,
             user_agent: metadata?.user_agent,
             created_at: new Date().toISOString(),
         };
 
-        await redisClient.set(`session:${tokens.session_id}`, JSON.stringify(newSessionData), 'EX', env.ttl.session);
-        await redisClient.sadd(`user_sessions:${user_id}`, tokens.session_id);
-        return tokens;
+        await redisClient.set(`session:${session_id}`, JSON.stringify(session_data), 'EX', env.ttl.session);
+        await redisClient.sadd(`user_sessions:${user_id}`, session_id);
+
+        return { access_token, refresh_token };
     }
 
     async mfa_setup_email(user_id: string): Promise<void> {

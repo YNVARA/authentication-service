@@ -28,9 +28,9 @@ export class AuthenticationRoutes {
         router.post('/verify/email/status', asyncHandler(this.controller.email_verification_status));
         router.post('/verify/email/resend', asyncHandler(this.controller.email_verification_resend));
 
-        router.post('/verify', validate(mfaVerifySchema), authMiddleware, asyncHandler(this.controller.mfa_verify));
-        router.post('/setup-email', validate(mfaSetupEmailSchema), authMiddleware, asyncHandler(this.controller.mfa_setup_email));
-        router.post('/toggle', validate(mfaToggleSchema), authMiddleware, asyncHandler(this.controller.mfa_toggle));
+        router.post('/mfa/verify', validate(mfaVerifySchema), asyncHandler(this.controller.mfa_verify));
+        router.post('/mfa/setup/email', validate(mfaSetupEmailSchema), authMiddleware, asyncHandler(this.controller.mfa_setup_email));
+        router.post('/mfa/toggle', validate(mfaToggleSchema), authMiddleware, asyncHandler(this.controller.mfa_toggle));
 
         return router;
     }
