@@ -129,4 +129,42 @@ export class AuthenticationController implements IAuthenticationController {
             data: response,
         });
     };
+
+    mfa_verify = async (req: Request, res: Response): Promise<any> => {
+        const { mfa_session, token } = req.body;
+        const metadata = {
+            ip: (req.headers['x-forwarded-for'] as string) || req.ip || '',
+            userAgent: (req.headers['user-agent'] as string) || '',
+        };
+
+        const response = await this.service.mfa_verify_session({ mfa_session, token }, metadata);
+
+        res.cookie('refresh_token', response.refresh_token, cookie_options);
+        res.cookie('authenticated', true, cookie_options);
+
+        return res.status(200).json({
+            success: true,
+            data: {
+                access_token: response.access_token,
+            },
+        });
+    };
+
+    mfa_setup_email = async (req: Request, res: Response): Promise<any> => {
+        const user = (req as any).user;
+        await this.service.mfa_setup_email(user.id, req.body.email);
+        return res.status(200).json({
+            success: true,
+            message: 'MFA email setup successfully',
+        });
+    };
+
+    mfa_toggle = async (req: Request, res: Response): Promise<any> => {
+        const user = (req as any).user;
+        await this.service.mfa_toggle(user.id, req.body.type, req.body.enabled);
+        return res.status(200).json({
+            success: true,
+            message: `MFA ${req.body.type} ${req.body.enabled ? 'enabled' : 'disabled'} successfully`,
+        });
+    };
 }

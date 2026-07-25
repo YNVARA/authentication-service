@@ -170,6 +170,87 @@ export const authenticationOpenApi = {
                 },
             },
         },
+        '/auth/mfa/verify': {
+            post: {
+                tags: ['Multi-Factor Authentication'],
+                summary: 'Verify MFA code to complete login',
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    mfa_session: { type: 'string', format: 'uuid' },
+                                    token: { type: 'string' },
+                                },
+                                required: ['mfa_session', 'token'],
+                            },
+                        },
+                    },
+                },
+                responses: {
+                    '200': {
+                        description: 'MFA verified, login successful',
+                        content: {
+                            'application/json': {
+                                schema: { $ref: '#/components/schemas/LoginResponse' },
+                            },
+                        },
+                    },
+                    '401': { description: 'Invalid or expired MFA token' },
+                },
+            },
+        },
+        '/auth/mfa/setup/email': {
+            post: {
+                tags: ['Multi-Factor Authentication'],
+                summary: 'Setup MFA via email',
+                security: [{ bearerAuth: [] }],
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    email: { type: 'string', format: 'email' },
+                                },
+                                required: ['email'],
+                            },
+                        },
+                    },
+                },
+                responses: {
+                    '200': { description: 'MFA email setup successful' },
+                },
+            },
+        },
+        '/auth/mfa/toggle': {
+            post: {
+                tags: ['Multi-Factor Authentication'],
+                summary: 'Enable or disable MFA method',
+                security: [{ bearerAuth: [] }],
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    type: { type: 'string', enum: ['EMAIL', 'TOTP', 'SMS'] },
+                                    enabled: { type: 'boolean' },
+                                },
+                                required: ['type', 'enabled'],
+                            },
+                        },
+                    },
+                },
+                responses: {
+                    '200': { description: 'MFA status updated' },
+                },
+            },
+        },
     },
     components: {
         schemas: {
@@ -221,6 +302,21 @@ export const authenticationOpenApi = {
                 properties: {
                     email: { type: 'string', format: 'email' },
                     otp: { type: 'string' },
+                },
+            },
+            MfaRequiredResponse: {
+                type: 'object',
+                properties: {
+                    success: { type: 'boolean' },
+                    message: { type: 'string' },
+                    data: {
+                        type: 'object',
+                        properties: {
+                            mfa_required: { type: 'boolean' },
+                            mfa_session: { type: 'string', format: 'uuid' },
+                            mfa_type: { type: 'string' },
+                        },
+                    },
                 },
             },
         },

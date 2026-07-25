@@ -6,7 +6,7 @@ import { asyncHandler } from '../core/http/async-handler';
 import { validate } from '../shared/middleware/validate.middleware';
 
 // validation and middleware
-import { registerSchema, loginSchema, emailVerifySchema } from './auth.validation';
+import { registerSchema, loginSchema, emailVerifySchema, mfaVerifySchema, mfaSetupEmailSchema, mfaToggleSchema } from './auth.validation';
 import authMiddleware from '../shared/middleware/auth.middleware';
 
 // interface
@@ -27,6 +27,10 @@ export class AuthenticationRoutes {
         router.post('/verify/email', validate(emailVerifySchema), asyncHandler(this.controller.email_verification));
         router.post('/verify/email/status', asyncHandler(this.controller.email_verification_status));
         router.post('/verify/email/resend', asyncHandler(this.controller.email_verification_resend));
+
+        router.post('/verify', validate(mfaVerifySchema), authMiddleware, asyncHandler(this.controller.mfa_verify));
+        router.post('/setup-email', validate(mfaSetupEmailSchema), authMiddleware, asyncHandler(this.controller.mfa_setup_email));
+        router.post('/toggle', validate(mfaToggleSchema), authMiddleware, asyncHandler(this.controller.mfa_toggle));
 
         return router;
     }

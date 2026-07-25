@@ -155,6 +155,33 @@ export class AuthenticationService implements IAuthenticationService {
             throw new HttpError(400, 'Invalid password', 'INVALID_PASSWORD', true);
         }
 
+        if (!user.verified_at) {
+            throw new HttpError(401, `${data.identifier.kind} not verified`, 'IDENTIFIER_NOT_VERIFIED', true);
+        }
+
+        const mfaMethods = await this.repo.get_multi_facator_methods(user.id);
+        const activeMfa = mfaMethods.find((m) => m.is_enabled && m.verified_at);
+
+        if (activeMfa) {
+            const mfaToken = generate_otp(6);
+            const mfaHash = hashing_otp(mfaToken);
+
+            // Temporary MFA session using MFA TTL from env
+            const mfaSessionId = crypto.randomUUID();
+            await redisClient.set(`mfa_session:${mfaSessionId}`, JSON.stringify({ userId: user.id, type: activeMfa.type, hash: mfaHash }), 'EX', env.ttl.mfa);
+
+            if (activeMfa.type === 'EMAIL') {
+                const profile = await this.repo.find_by_id(user.id);
+                await send_email({
+                    to: profile.primary_identifier,
+                    subject: 'Login MFA Code',
+                    html: `<p>Your login code is: <b>${mfaToken}</b></p><p>This code will expire in ${env.ttl.mfa / 60} minutes.</p>`,
+                });
+            }
+
+            return { mfa_required: true, mfa_session: mfaSessionId, mfa_type: activeMfa.type };
+        }
+
         const { access_token, refresh_token, session_id } = await generate_tokens(user.id);
         const session_data = {
             user_id: user.id,
@@ -257,5 +284,45 @@ export class AuthenticationService implements IAuthenticationService {
             verified: !!user.verified_at,
             verified_at: user.verified_at,
         };
+    }
+
+    // async mfa_verify(data: { user_id: string; token: string; type: string }): Promise<any> {
+    //     return { message: 'Not implemented via specific session yet' };
+    // }
+
+    async mfa_verify_session(data: { mfa_session: string; token: string }, metadata?: { ip?: string; user_agent?: string }): Promise<any> {
+        const { mfa_session, token } = data;
+        const sessionData = await redisClient.get(`mfa_session:${mfa_session}`);
+        if (!sessionData) {
+            throw new HttpError(401, 'MFA session expired', 'MFA_EXPIRED', true);
+        }
+
+        const { user_id, hash } = JSON.parse(sessionData);
+        if (!compare_otp(token, hash)) {
+            throw new HttpError(401, 'Invalid MFA token', 'INVALID_MFA', true);
+        }
+
+        await redisClient.del(`mfa_session:${mfa_session}`);
+
+        const tokens = generate_tokens(user_id);
+        const newSessionData = {
+            user_id,
+            ip: metadata?.ip,
+            user_agent: metadata?.user_agent,
+            created_at: new Date().toISOString(),
+        };
+
+        await redisClient.set(`session:${tokens.session_id}`, JSON.stringify(newSessionData), 'EX', env.ttl.session);
+        await redisClient.sadd(`user_sessions:${user_id}`, tokens.session_id);
+        return tokens;
+    }
+
+    async mfa_setup_email(user_id: string): Promise<void> {
+        await this.repo.upsert_multi_factor_method(user_id, { type: 'EMAIL', is_enabled: true });
+        await this.repo.verify_multi_factor_method(user_id, 'EMAIL');
+    }
+
+    async mfa_toggle(user_id: string, type: string, enabled: boolean): Promise<void> {
+        await this.repo.upsert_multi_factor_method(user_id, { type: type as any, is_enabled: enabled });
     }
 }

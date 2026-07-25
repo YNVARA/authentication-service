@@ -115,4 +115,28 @@ export class AuthenticationRepository implements IAuthenticationRepository {
         `;
         await this.db.query(query, [data.user_id, data.kind, normalized_value]);
     }
+
+    async get_multi_facator_methods(user_id: string): Promise<any[]> {
+        const query = `SELECT type, secret, verified_at, is_enabled FROM auth.mfa_methods WHERE user_id = $1`;
+        const res = await this.db.query(query, [user_id]);
+        return res.rows;
+    }
+
+    async upsert_multi_factor_method(user_id: string, data: { type: 'EMAIL' | 'TOTP' | 'SMS'; secret?: string; is_enabled?: boolean }): Promise<void> {
+        const query = `
+            INSERT INTO auth.mfa_methods (user_id, type, secret, is_enabled)
+            VALUES ($1, $2, $3, $4)
+            ON CONFLICT (user_id, type)
+            DO UPDATE SET
+                secret = EXCLUDED.secret,
+                is_enabled = EXCLUDED.is_enabled,
+                updated_at = NOW()
+        `;
+        await this.db.query(query, [user_id, data.type, data.secret || null, data.is_enabled ?? true]);
+    }
+
+    async verify_multi_factor_method(user_id: string, type: string): Promise<void> {
+        const query = `UPDATE auth.mfa_methods SET verified_at = NOW(), updated_at = NOW() WHERE user_id = $1 AND type = $2`;
+        await this.db.query(query, [user_id, type]);
+    }
 }

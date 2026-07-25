@@ -50,3 +50,23 @@ export const emailVerifySchema = z.object({
         otp: z.string().trim().min(1, { message: 'OTP is required' }),
     }),
 });
+
+export const mfaVerifySchema = z.object({
+    body: z.object({
+        mfa_session: z.string().uuid(),
+        token: z.string().min(1),
+    }),
+});
+
+export const mfaSetupEmailSchema = z.object({
+    body: z.object({
+        email: z.string().email(),
+    }),
+});
+
+export const mfaToggleSchema = z.object({
+    body: z.object({
+        type: z.enum(['EMAIL', 'TOTP', 'SMS']),
+        enabled: z.boolean(),
+    }),
+});
