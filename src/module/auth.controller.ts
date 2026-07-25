@@ -24,7 +24,7 @@ export class AuthenticationController implements IAuthenticationController {
             is_verified,
         });
 
-        return res.status(201).json({
+        res.status(201).json({
             success: true,
             message: response.is_verified ? 'Registered successfully' : 'Please check your email for verification code',
             data: response,
@@ -53,7 +53,21 @@ export class AuthenticationController implements IAuthenticationController {
         res.cookie('refresh_token', response.refresh_token, cookie_options);
         res.cookie('authenticated', true, cookie_options);
 
-        return res.status(200).json({
+        res.status(200).json({
+            success: true,
+            data: {
+                access_token: response.access_token,
+            },
+        });
+    };
+
+    generate_token = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        const token = req.cookies.refresh_token;
+        const response = await this.service.generate_token({
+            refresh_token: token,
+        });
+
+        res.status(200).json({
             success: true,
             data: {
                 access_token: response.access_token,

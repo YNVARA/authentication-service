@@ -97,6 +97,11 @@ export class AuthenticationService implements IAuthenticationService {
         return { user, access_token, refresh_token };
     }
 
+    async generate_token(data: { refresh_token: string }): Promise<any> {
+        const accessToken = await refresh_access_token(data.refresh_token);
+        return { access_token: accessToken };
+    }
+
     async logout(data: { sid: string; user_id?: string }): Promise<void> {
         const sessionData = await redisClient.get(`session:${data.sid}`);
         let user_id = data.user_id;

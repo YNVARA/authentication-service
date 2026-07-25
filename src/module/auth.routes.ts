@@ -20,6 +20,7 @@ export class AuthenticationRoutes {
 
         router.post('/register', validate(registerSchema), asyncHandler(this.controller.register));
         router.post('/login', validate(loginSchema), asyncHandler(this.controller.login));
+        router.get('/token', asyncHandler(this.controller.generate_token));
         router.post('/logout', authMiddleware, asyncHandler(this.controller.logout));
 
         return router;

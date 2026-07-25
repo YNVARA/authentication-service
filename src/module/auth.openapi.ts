@@ -52,6 +52,33 @@ export const authenticationOpenApi = {
                 },
             },
         },
+        '/auth/token': {
+            get: {
+                tags: ['Authentication'],
+                summary: 'Refresh token',
+                responses: {
+                    '200': {
+                        description: 'Token refreshed',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        success: { type: 'boolean' },
+                                        data: {
+                                            type: 'object',
+                                            properties: {
+                                                access_token: { type: 'string' },
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
         '/auth/logout': {
             post: {
                 tags: ['Authentication'],
