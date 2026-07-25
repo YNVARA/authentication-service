@@ -75,6 +75,15 @@ export class AuthenticationController implements IAuthenticationController {
         });
     };
 
+    me = async (req: Request, res: Response): Promise<any> => {
+        const user = (req as any).user;
+        const response = await this.service.me(user.id);
+        return res.status(200).json({
+            success: true,
+            data: response,
+        });
+    };
+
     logout = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         const user = (req as any).user;
         if (user?.session_id) {

@@ -79,6 +79,23 @@ export const authenticationOpenApi = {
                 },
             },
         },
+        '/auth/me': {
+            get: {
+                tags: ['Authentication'],
+                summary: 'Get current logged in',
+                security: [{ bearerAuth: [] }],
+                responses: {
+                    '200': {
+                        description: 'User profile retrieved',
+                        content: {
+                            'application/json': {
+                                schema: { $ref: '#/components/schemas/UserResponse' },
+                            },
+                        },
+                    },
+                },
+            },
+        },
         '/auth/logout': {
             post: {
                 tags: ['Authentication'],

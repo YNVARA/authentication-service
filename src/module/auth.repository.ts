@@ -82,27 +82,26 @@ export class AuthenticationRepository implements IAuthenticationRepository {
             SELECT
                 u.id,
                 u.status,
-                u.created_at,
+                CONCAT(
+                    COALESCE(up.first_name, ''),
+                    CASE
+                        WHEN up.first_name IS NOT NULL
+                        AND up.last_name IS NOT NULL
+                        THEN ' '
+                        ELSE ''
+                    END,
+                    COALESCE(up.last_name, '')
+                ) AS full_name,
                 up.first_name,
                 up.last_name,
-                up.avatar_url,
-                (SELECT value FROM auth.user_identifiers WHERE user_id = u.id AND is_primary = TRUE LIMIT 1) as primary_identifier
+                ui.normalized_value AS email
             FROM auth.users u
             LEFT JOIN auth.user_profiles up ON u.id = up.user_id
-            WHERE u.id = $1
+            LEFT JOIN auth.user_identifiers ui ON u.id = ui.user_id
+            AND ui.kind = 'EMAIL' WHERE u.id = $1 LIMIT 1;
         `;
+
         const res = await this.db.query(query, [id]);
-        return res.rows[0];
-    }
-
-    async save_password(user_id: string, password_hash: string): Promise<void> {
-        const q = `INSERT INTO auth.password_credentials (user_id, password_hash) VALUES ($1, $2)`;
-        await this.db.query(q, [user_id, password_hash]);
-    }
-
-    async get_password_hash(user_id: string): Promise<string | null> {
-        const q = `SELECT password_hash FROM auth.password_credentials WHERE user_id = $1`;
-        const res = await this.db.query(q, [user_id]);
-        return res.rows[0]?.password_hash;
+        return res.rows[0] ?? null;
     }
 }

@@ -102,6 +102,12 @@ export class AuthenticationService implements IAuthenticationService {
         return { access_token: accessToken };
     }
 
+    async me(user_id: string): Promise<any> {
+        const user = await this.repo.find_by_id(user_id);
+        if (!user) throw new HttpError(404, 'User not found', 'USER_NOT_FOUND', true);
+        return user;
+    }
+
     async logout(data: { sid: string; user_id?: string }): Promise<void> {
         const sessionData = await redisClient.get(`session:${data.sid}`);
         let user_id = data.user_id;
